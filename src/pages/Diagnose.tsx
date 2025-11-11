@@ -118,15 +118,25 @@ export default function Diagnose() {
     setIsAnalyzing(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("Not authenticated");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
 
-      // For now, we'll use the image preview as base64 if available
+      // Upload image first if provided
+      let uploadedImageUrl = "";
+      if (imageFile) {
+        const url = await uploadImage(imageFile, user.id);
+        if (url) {
+          uploadedImageUrl = url;
+        } else {
+          throw new Error("Failed to upload image");
+        }
+      }
+
       const { data, error } = await supabase.functions.invoke("analyze-disease", {
         body: {
-          cattleId: selectedCattle,
+          cattle_id: selectedCattle,
           symptoms: selectedSymptoms.length > 0 ? selectedSymptoms : undefined,
-          imageUrl: imagePreview || undefined,
+          image_url: uploadedImageUrl || undefined,
         },
       });
 

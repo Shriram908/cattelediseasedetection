@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, LogOut, Menu, X, User } from "lucide-react";
+import { Stethoscope, LogOut, Menu, X, User, Settings } from "lucide-react";
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -91,6 +91,24 @@ export default function NavBar() {
                 </Link>
               </>
             )}
+            {userRole === "veterinarian" && (
+              <Link
+                to="/vet-profile"
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  isActive("/vet-profile") ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                My Clinic
+              </Link>
+            )}
+            <Link
+              to="/profile"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/profile") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <User className="h-4 w-4" />
+            </Link>
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
               Logout
@@ -110,48 +128,64 @@ export default function NavBar() {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-3 border-t">
-            <Link
-              to="/dashboard"
-              className="block text-sm font-medium"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
-            {userRole === "farmer" && (
-              <>
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <div className="md:hidden py-4 space-y-3 border-t">
+              <Link
+                to="/dashboard"
+                className="block text-sm font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Dashboard
+              </Link>
+              {userRole === "farmer" && (
+                <>
+                  <Link
+                    to="/diagnose"
+                    className="block text-sm font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Diagnose
+                  </Link>
+                  <Link
+                    to="/veterinarians"
+                    className="block text-sm font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Find Vets
+                  </Link>
+                </>
+              )}
+              {userRole === "veterinarian" && (
                 <Link
-                  to="/diagnose"
+                  to="/vet-profile"
                   className="block text-sm font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  Diagnose
+                  My Clinic
                 </Link>
-                <Link
-                  to="/veterinarians"
-                  className="block text-sm font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Find Vets
-                </Link>
-              </>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                handleLogout();
-                setMobileMenuOpen(false);
-              }}
-              className="w-full justify-start"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        )}
+              )}
+              <Link
+                to="/profile"
+                className="block text-sm font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Profile
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  handleLogout();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full justify-start"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
+          )}
       </div>
     </nav>
   );

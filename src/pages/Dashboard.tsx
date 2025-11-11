@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Activity, Plus, FileText, Heart, AlertCircle } from "lucide-react";
+import { Activity, Plus, FileText, Heart, AlertCircle, Settings } from "lucide-react";
 import { Session, User } from "@supabase/supabase-js";
 
 interface Profile {
@@ -221,7 +221,7 @@ const Dashboard = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {cattle.map((animal) => (
-                  <Card key={animal.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                  <Card key={animal.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Heart className="h-5 w-5 text-primary" />
@@ -236,13 +236,22 @@ const Dashboard = () => {
                         {animal.breed && <p><span className="text-muted-foreground">Breed:</span> {animal.breed}</p>}
                         {animal.age && <p><span className="text-muted-foreground">Age:</span> {animal.age} years</p>}
                       </div>
-                      <Button
-                        className="w-full mt-4"
-                        variant="outline"
-                        onClick={() => navigate(`/diagnose?cattle=${animal.id}`)}
-                      >
-                        Start Diagnosis
-                      </Button>
+                      <div className="flex gap-2 mt-4">
+                        <Button
+                          className="flex-1"
+                          variant="outline"
+                          onClick={() => navigate(`/diagnose?cattle=${animal.id}`)}
+                        >
+                          Diagnose
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => navigate(`/cattle/edit/${animal.id}`)}
+                        >
+                          <Settings className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 ))}
