@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -101,6 +102,9 @@ export default function Report() {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="no-print">
+        <NavBar />
+      </div>
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Header - Hidden on print */}
         <div className="mb-8 print:hidden">

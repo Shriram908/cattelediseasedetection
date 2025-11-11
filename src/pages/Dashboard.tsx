@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Activity, Plus, FileText, Heart, LogOut, AlertCircle } from "lucide-react";
+import { Activity, Plus, FileText, Heart, AlertCircle } from "lucide-react";
 import { Session, User } from "@supabase/supabase-js";
 
 interface Profile {
   id: string;
   full_name: string | null;
-  role: string;
   email: string;
 }
 
@@ -40,6 +40,7 @@ const Dashboard = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [cattle, setCattle] = useState<Cattle[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,6 +84,17 @@ const Dashboard = () => {
 
       if (profileError) throw profileError;
       setProfile(profileData);
+
+      // Fetch user role
+      const { data: roleData } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user?.id)
+        .single();
+      
+      if (roleData) {
+        setUserRole(roleData.role);
+      }
 
       // Fetch cattle
       const { data: cattleData, error: cattleError } = await supabase
@@ -143,32 +155,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background">
-      {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Activity className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-xl font-bold text-foreground">CattleCare AI</h1>
-              <p className="text-sm text-muted-foreground">Welcome, {profile?.full_name}</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/diagnose")}
-              className="gap-2"
-            >
-              <AlertCircle className="h-4 w-4" />
-              New Diagnosis
-            </Button>
-            <Button variant="ghost" onClick={handleLogout} className="gap-2">
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
       <main className="container mx-auto px-4 py-8">
         {/* Stats Overview */}
@@ -201,7 +188,7 @@ const Dashboard = () => {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold capitalize">{profile?.role}</div>
+              <div className="text-2xl font-bold capitalize">{userRole || "User"}</div>
               <p className="text-xs text-muted-foreground">{profile?.email}</p>
             </CardContent>
           </Card>

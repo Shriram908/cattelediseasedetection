@@ -111,7 +111,6 @@ export type Database = {
           id: string
           location: string | null
           phone: string | null
-          role: string
           updated_at: string
         }
         Insert: {
@@ -121,7 +120,6 @@ export type Database = {
           id: string
           location?: string | null
           phone?: string | null
-          role: string
           updated_at?: string
         }
         Update: {
@@ -131,7 +129,6 @@ export type Database = {
           id?: string
           location?: string | null
           phone?: string | null
-          role?: string
           updated_at?: string
         }
         Relationships: []
@@ -199,6 +196,27 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       vet_notes: {
         Row: {
           created_at: string
@@ -247,15 +265,91 @@ export type Database = {
           },
         ]
       }
+      veterinarians: {
+        Row: {
+          available_days: string[] | null
+          city: string
+          clinic_address: string
+          clinic_name: string
+          consultation_fee: number | null
+          consultation_hours: string | null
+          created_at: string | null
+          experience_years: number | null
+          id: string
+          is_verified: boolean | null
+          latitude: number | null
+          license_number: string | null
+          longitude: number | null
+          phone: string
+          pincode: string | null
+          specialization: string | null
+          state: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          available_days?: string[] | null
+          city: string
+          clinic_address: string
+          clinic_name: string
+          consultation_fee?: number | null
+          consultation_hours?: string | null
+          created_at?: string | null
+          experience_years?: number | null
+          id?: string
+          is_verified?: boolean | null
+          latitude?: number | null
+          license_number?: string | null
+          longitude?: number | null
+          phone: string
+          pincode?: string | null
+          specialization?: string | null
+          state: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          available_days?: string[] | null
+          city?: string
+          clinic_address?: string
+          clinic_name?: string
+          consultation_fee?: number | null
+          consultation_hours?: string | null
+          created_at?: string | null
+          experience_years?: number | null
+          id?: string
+          is_verified?: boolean | null
+          latitude?: number | null
+          license_number?: string | null
+          longitude?: number | null
+          phone?: string
+          pincode?: string | null
+          specialization?: string | null
+          state?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "farmer" | "veterinarian"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -382,6 +476,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["farmer", "veterinarian"],
+    },
   },
 } as const
