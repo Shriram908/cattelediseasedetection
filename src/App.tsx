@@ -13,6 +13,7 @@ import Report from "./pages/Report";
 import Veterinarians from "./pages/Veterinarians";
 import VetProfile from "./pages/VetProfile";
 import Profile from "./pages/Profile";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/veterinarians" element={<Veterinarians />} />
           <Route path="/vet-profile" element={<VetProfile />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/messages" element={<Messages />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

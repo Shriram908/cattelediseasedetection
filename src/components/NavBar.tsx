@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, LogOut, Menu, X, User, Settings } from "lucide-react";
+import { Stethoscope, LogOut, Menu, X, User, MessageSquare } from "lucide-react";
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -102,6 +102,14 @@ export default function NavBar() {
               </Link>
             )}
             <Link
+              to="/messages"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/messages") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <MessageSquare className="h-4 w-4" />
+            </Link>
+            <Link
               to="/profile"
               className={`text-sm font-medium transition-colors hover:text-primary ${
                 isActive("/profile") ? "text-primary" : "text-muted-foreground"
@@ -165,6 +173,13 @@ export default function NavBar() {
                   My Clinic
                 </Link>
               )}
+              <Link
+                to="/messages"
+                className="block text-sm font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Messages
+              </Link>
               <Link
                 to="/profile"
                 className="block text-sm font-medium"

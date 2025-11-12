@@ -61,6 +61,41 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          created_at: string
+          farmer_id: string
+          id: string
+          report_id: string | null
+          updated_at: string
+          vet_id: string
+        }
+        Insert: {
+          created_at?: string
+          farmer_id: string
+          id?: string
+          report_id?: string | null
+          updated_at?: string
+          vet_id: string
+        }
+        Update: {
+          created_at?: string
+          farmer_id?: string
+          id?: string
+          report_id?: string | null
+          updated_at?: string
+          vet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diseases: {
         Row: {
           created_at: string
@@ -102,6 +137,41 @@ export type Database = {
           veterinarian_recommended?: boolean
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read: boolean
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read?: boolean
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
