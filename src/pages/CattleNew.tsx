@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import NavBar from "@/components/NavBar";
 
 export default function CattleNew() {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ export default function CattleNew() {
 
   return (
     <div className="min-h-screen bg-background">
+      <NavBar />
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-foreground mb-2">Register Cattle</h1>
