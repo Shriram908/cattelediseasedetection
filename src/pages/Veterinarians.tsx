@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import NavBar from "@/components/NavBar";
 import { Card } from "@/components/ui/card";
@@ -9,6 +10,7 @@ import { MapPin, Phone, Stethoscope, Clock, Search, DollarSign } from "lucide-re
 import { useToast } from "@/hooks/use-toast";
 
 export default function Veterinarians() {
+  const navigate = useNavigate();
   const [vets, setVets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState("");
@@ -183,6 +185,14 @@ export default function Veterinarians() {
                       <Phone className="h-4 w-4 mr-2" />
                       Call Now
                     </a>
+                  </Button>
+
+                  <Button 
+                    className="w-full"
+                    variant="outline"
+                    onClick={() => navigate(`/appointments/new?vet_id=${vet.user_id}`)}
+                  >
+                    Book Appointment
                   </Button>
                 </div>
               </Card>

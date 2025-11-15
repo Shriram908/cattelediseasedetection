@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, LogOut, Menu, X, User, MessageSquare } from "lucide-react";
+import { Stethoscope, LogOut, Menu, X, User, MessageSquare, Calendar, Syringe } from "lucide-react";
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -109,6 +109,36 @@ export default function NavBar() {
             >
               <MessageSquare className="h-4 w-4" />
             </Link>
+            {userRole === "farmer" && (
+              <>
+                <Link
+                  to="/appointments"
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    isActive("/appointments") ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  <Calendar className="h-4 w-4" />
+                </Link>
+                <Link
+                  to="/vaccinations"
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    isActive("/vaccinations") ? "text-primary" : "text-muted-foreground"
+                  }`}
+                >
+                  <Syringe className="h-4 w-4" />
+                </Link>
+              </>
+            )}
+            {userRole === "veterinarian" && (
+              <Link
+                to="/appointments"
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  isActive("/appointments") ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <Calendar className="h-4 w-4" />
+              </Link>
+            )}
             <Link
               to="/profile"
               className={`text-sm font-medium transition-colors hover:text-primary ${
@@ -180,6 +210,33 @@ export default function NavBar() {
               >
                 Messages
               </Link>
+              {userRole === "farmer" && (
+                <>
+                  <Link
+                    to="/appointments"
+                    className="block text-sm font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Appointments
+                  </Link>
+                  <Link
+                    to="/vaccinations"
+                    className="block text-sm font-medium"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Vaccinations
+                  </Link>
+                </>
+              )}
+              {userRole === "veterinarian" && (
+                <Link
+                  to="/appointments"
+                  className="block text-sm font-medium"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Appointments
+                </Link>
+              )}
               <Link
                 to="/profile"
                 className="block text-sm font-medium"
