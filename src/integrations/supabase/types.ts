@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_date: string
+          cattle_id: string | null
+          created_at: string
+          farmer_id: string
+          id: string
+          notes: string | null
+          reason: string
+          status: string
+          updated_at: string
+          vet_id: string
+        }
+        Insert: {
+          appointment_date: string
+          cattle_id?: string | null
+          created_at?: string
+          farmer_id: string
+          id?: string
+          notes?: string | null
+          reason: string
+          status?: string
+          updated_at?: string
+          vet_id: string
+        }
+        Update: {
+          appointment_date?: string
+          cattle_id?: string | null
+          created_at?: string
+          farmer_id?: string
+          id?: string
+          notes?: string | null
+          reason?: string
+          status?: string
+          updated_at?: string
+          vet_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_cattle_id_fkey"
+            columns: ["cattle_id"]
+            isOneToOne: false
+            referencedRelation: "cattle"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cattle: {
         Row: {
           age: number | null
@@ -22,6 +69,7 @@ export type Database = {
           created_at: string
           farm_location: string | null
           id: string
+          image_url: string | null
           name: string
           owner_id: string
           updated_at: string
@@ -34,6 +82,7 @@ export type Database = {
           created_at?: string
           farm_location?: string | null
           id?: string
+          image_url?: string | null
           name: string
           owner_id: string
           updated_at?: string
@@ -46,6 +95,7 @@ export type Database = {
           created_at?: string
           farm_location?: string | null
           id?: string
+          image_url?: string | null
           name?: string
           owner_id?: string
           updated_at?: string
@@ -286,6 +336,53 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vaccinations: {
+        Row: {
+          administered_by: string | null
+          batch_number: string | null
+          cattle_id: string
+          created_at: string
+          id: string
+          next_due_date: string | null
+          notes: string | null
+          updated_at: string
+          vaccination_date: string
+          vaccine_name: string
+        }
+        Insert: {
+          administered_by?: string | null
+          batch_number?: string | null
+          cattle_id: string
+          created_at?: string
+          id?: string
+          next_due_date?: string | null
+          notes?: string | null
+          updated_at?: string
+          vaccination_date: string
+          vaccine_name: string
+        }
+        Update: {
+          administered_by?: string | null
+          batch_number?: string | null
+          cattle_id?: string
+          created_at?: string
+          id?: string
+          next_due_date?: string | null
+          notes?: string | null
+          updated_at?: string
+          vaccination_date?: string
+          vaccine_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccinations_cattle_id_fkey"
+            columns: ["cattle_id"]
+            isOneToOne: false
+            referencedRelation: "cattle"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       vet_notes: {
         Row: {

@@ -21,9 +21,45 @@ export default function CattleNew() {
     weight: "",
     farm_location: "",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file: File, userId: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${userId}/${Date.now()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('cattle-images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('cattle-images')
+        .getPublicUrl(fileName);
+
+      return publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,6 +70,15 @@ export default function CattleNew() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
+      // Upload image if provided
+      let uploadedImageUrl = "";
+      if (imageFile) {
+        const url = await uploadImage(imageFile, user.id);
+        if (url) {
+          uploadedImageUrl = url;
+        }
+      }
+
       const { error } = await supabase.from("cattle").insert({
         owner_id: user.id,
         name: formData.name,
@@ -42,6 +87,7 @@ export default function CattleNew() {
         age: formData.age ? parseInt(formData.age) : null,
         weight: formData.weight ? parseFloat(formData.weight) : null,
         farm_location: formData.farm_location || null,
+        image_url: uploadedImageUrl || null,
       });
 
       if (error) throw error;
@@ -150,6 +196,25 @@ export default function CattleNew() {
                 onChange={handleChange}
                 placeholder="e.g., Shed A, Field 3"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="image">Cattle Photo (Optional)</Label>
+              <Input
+                id="image"
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              {imagePreview && (
+                <div className="mt-2">
+                  <img
+                    src={imagePreview}
+                    alt="Cattle preview"
+                    className="w-full h-48 object-cover rounded-md"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="flex gap-4 pt-4">
