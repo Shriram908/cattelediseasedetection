@@ -178,7 +178,7 @@ const Index = () => {
       {/* Footer */}
       <footer className="py-8 border-t bg-card">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>&copy; 2025 CattleCare AI. Advanced AI-powered cattle disease detection system.</p>
+          <p>&copy; 2026 CattleCare AI. Advanced AI-powered cattle disease detection system.</p>
         </div>
       </footer>
     </div>
