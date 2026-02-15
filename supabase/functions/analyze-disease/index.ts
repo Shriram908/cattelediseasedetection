@@ -38,7 +38,10 @@ serve(async (req) => {
       throw new Error("Unauthorized");
     }
 
-    const { symptoms, imageUrl, cattleId }: DiagnosisRequest = await req.json();
+    const body = await req.json();
+    const symptoms = body.symptoms;
+    const imageUrl = body.image_url || body.imageUrl;
+    const cattleId = body.cattle_id || body.cattleId;
 
     console.log("Analyzing disease for cattle:", cattleId);
     console.log("Symptoms provided:", symptoms);

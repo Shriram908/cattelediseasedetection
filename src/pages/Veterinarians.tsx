@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Phone, Stethoscope, Clock, Search, DollarSign } from "lucide-react";
+import { MapPin, Phone, Stethoscope, Clock, Search, DollarSign, MessageSquare, Calendar } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function Veterinarians() {
@@ -14,9 +14,13 @@ export default function Veterinarians() {
   const [vets, setVets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchCity, setSearchCity] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserId(user?.id || null);
+    });
     fetchVeterinarians();
   }, []);
 
@@ -27,7 +31,7 @@ export default function Veterinarians() {
         .from("veterinarians")
         .select(`
           *,
-          profiles!inner(full_name, email)
+          profiles:user_id (full_name, email)
         `)
         .eq("is_verified", true);
 
@@ -54,6 +58,52 @@ export default function Veterinarians() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     fetchVeterinarians(searchCity);
+  };
+
+  const startConversation = async (vetUserId: string) => {
+    if (!userId) {
+      navigate("/auth");
+      return;
+    }
+
+    try {
+      // Check if conversation already exists
+      const { data: existing } = await supabase
+        .from("conversations")
+        .select("id")
+        .eq("farmer_id", userId)
+        .eq("vet_id", vetUserId)
+        .single();
+
+      if (existing) {
+        navigate("/messages");
+        return;
+      }
+
+      // Create new conversation
+      const { error } = await supabase
+        .from("conversations")
+        .insert({
+          farmer_id: userId,
+          vet_id: vetUserId,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Conversation started",
+        description: "You can now message this veterinarian.",
+      });
+
+      navigate("/messages");
+    } catch (error: any) {
+      console.error("Error starting conversation:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start conversation",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -180,20 +230,32 @@ export default function Veterinarians() {
                     </div>
                   )}
 
-                  <Button className="w-full" asChild>
-                    <a href={`tel:${vet.phone}`}>
-                      <Phone className="h-4 w-4 mr-2" />
-                      Call Now
-                    </a>
-                  </Button>
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button className="w-full" asChild>
+                      <a href={`tel:${vet.phone}`}>
+                        <Phone className="h-4 w-4 mr-1" />
+                        Call
+                      </a>
+                    </Button>
 
-                  <Button 
-                    className="w-full"
-                    variant="outline"
-                    onClick={() => navigate(`/appointments/new?vet_id=${vet.user_id}`)}
-                  >
-                    Book Appointment
-                  </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => startConversation(vet.user_id)}
+                    >
+                      <MessageSquare className="h-4 w-4 mr-1" />
+                      Chat
+                    </Button>
+
+                    <Button
+                      variant="secondary"
+                      className="w-full"
+                      onClick={() => navigate(`/appointments/new?vet_id=${vet.user_id}`)}
+                    >
+                      <Calendar className="h-4 w-4 mr-1" />
+                      Book
+                    </Button>
+                  </div>
                 </div>
               </Card>
             ))}
