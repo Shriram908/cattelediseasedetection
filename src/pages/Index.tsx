@@ -2,9 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Brain, FileText, MapPin, Shield, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { useI18n } from "@/lib/i18n";
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useI18n();
 
   const features = [
     {
@@ -41,6 +43,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Top bar with language switcher */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher />
+      </div>
+
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-20 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
@@ -53,36 +60,35 @@ const Index = () => {
             </div>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              CattleCare AI
+              {t("landing.hero")}
             </h1>
             
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Advanced machine learning system for early detection and diagnosis of cattle diseases. 
-              Protect your herd with instant AI-powered analysis.
+              {t("landing.heroSub")}
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" onClick={() => navigate("/auth")} className="text-lg px-8">
-                Get Started
+                {t("landing.getStarted")}
                 <Activity className="ml-2 h-5 w-5" />
               </Button>
               <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
-                Learn More
+                {t("landing.learnMore")}
               </Button>
             </div>
 
             <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">26+</div>
-                <div className="text-sm text-muted-foreground">Diseases Detected</div>
+                <div className="text-sm text-muted-foreground">{t("landing.diseases")}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">92+</div>
-                <div className="text-sm text-muted-foreground">Symptoms Analyzed</div>
+                <div className="text-sm text-muted-foreground">{t("landing.symptoms")}</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary">95%+</div>
-                <div className="text-sm text-muted-foreground">Accuracy Rate</div>
+                <div className="text-sm text-muted-foreground">{t("landing.accuracy")}</div>
               </div>
             </div>
           </div>
@@ -93,9 +99,9 @@ const Index = () => {
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Comprehensive Features</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("landing.features")}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Everything you need to monitor and maintain the health of your cattle herd
+              {t("landing.featuresSub")}
             </p>
           </div>
 
@@ -121,8 +127,8 @@ const Index = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
-            <p className="text-lg text-muted-foreground">Simple, fast, and accurate diagnosis in 3 easy steps</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("landing.howItWorks")}</h2>
+            <p className="text-lg text-muted-foreground">{t("landing.howItWorksSub")}</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -163,13 +169,13 @@ const Index = () => {
       <section className="py-20 bg-gradient-to-br from-primary via-primary-glow to-primary">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary-foreground">
-            Ready to Protect Your Herd?
+            {t("landing.cta")}
           </h2>
           <p className="text-lg text-primary-foreground/90 mb-8 max-w-2xl mx-auto">
-            Join thousands of farmers and veterinarians using CattleCare AI for accurate disease detection
+            {t("landing.ctaSub")}
           </p>
           <Button size="lg" variant="secondary" onClick={() => navigate("/auth")} className="text-lg px-8">
-            Start Free Trial
+            {t("landing.startTrial")}
             <Activity className="ml-2 h-5 w-5" />
           </Button>
         </div>
