@@ -10,6 +10,7 @@ import { Activity, Plus, FileText, Heart, Settings, Calendar, Syringe, AlertCirc
 import { Session, User } from "@supabase/supabase-js";
 import { format, isBefore, addDays } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { useI18n } from "@/lib/i18n";
 
 interface Profile {
   id: string;
@@ -40,6 +41,7 @@ interface Report {
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useI18n();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
@@ -179,9 +181,11 @@ const Dashboard = () => {
         {/* Welcome */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground">
-            Welcome back, {profile?.full_name || "User"}!
+            {t("dashboard.welcome")}, {profile?.full_name || "User"}!
           </h1>
-          <p className="text-muted-foreground capitalize">{userRole} Dashboard</p>
+          <p className="text-muted-foreground capitalize">
+            {userRole === "farmer" ? t("dashboard.farmerDashboard") : t("dashboard.vetDashboard")}
+          </p>
         </div>
 
         {/* Stats Overview */}
@@ -190,7 +194,7 @@ const Dashboard = () => {
             <>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Cattle</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.totalCattle")}</CardTitle>
                   <Heart className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -200,7 +204,7 @@ const Dashboard = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Diagnoses</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.diagnoses")}</CardTitle>
                   <FileText className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -210,7 +214,7 @@ const Dashboard = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Upcoming Appts</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.upcomingAppts")}</CardTitle>
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -220,13 +224,13 @@ const Dashboard = () => {
 
               <Card className={dueVaccinations.length > 0 ? "border-warning" : ""}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Due Vaccinations</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.dueVaccinations")}</CardTitle>
                   <Syringe className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{dueVaccinations.length}</div>
                   {dueVaccinations.length > 0 && (
-                    <p className="text-xs text-warning">Action needed</p>
+                    <p className="text-xs text-warning">{t("dashboard.actionNeeded")}</p>
                   )}
                 </CardContent>
               </Card>
@@ -350,16 +354,16 @@ const Dashboard = () => {
         {userRole === "farmer" && (
           <Tabs defaultValue="cattle" className="space-y-6">
             <TabsList>
-              <TabsTrigger value="cattle">My Cattle</TabsTrigger>
-              <TabsTrigger value="reports">Diagnosis History</TabsTrigger>
+              <TabsTrigger value="cattle">{t("dashboard.myCattle")}</TabsTrigger>
+              <TabsTrigger value="reports">{t("dashboard.diagnosisHistory")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="cattle" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold">Cattle Registry</h2>
+                <h2 className="text-2xl font-bold">{t("dashboard.cattleRegistry")}</h2>
                 <Button onClick={() => navigate("/cattle/new")} className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Add Cattle
+                  {t("dashboard.addCattle")}
                 </Button>
               </div>
 
@@ -367,8 +371,8 @@ const Dashboard = () => {
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-12">
                     <Heart className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground mb-4">No cattle registered yet</p>
-                    <Button onClick={() => navigate("/cattle/new")}>Add Your First Cattle</Button>
+                    <p className="text-muted-foreground mb-4">{t("dashboard.noCattle")}</p>
+                    <Button onClick={() => navigate("/cattle/new")}>{t("dashboard.addFirst")}</Button>
                   </CardContent>
                 </Card>
               ) : (

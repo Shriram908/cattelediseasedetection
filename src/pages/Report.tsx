@@ -65,13 +65,13 @@ export default function Report() {
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {
       case "mild":
-        return "bg-severity-mild text-severity-mild-foreground";
+        return "bg-severity-mild/10 text-severity-mild border border-severity-mild/20";
       case "moderate":
-        return "bg-severity-moderate text-severity-moderate-foreground";
+        return "bg-severity-moderate/10 text-severity-moderate border border-severity-moderate/20";
       case "severe":
-        return "bg-severity-severe text-severity-severe-foreground";
+        return "bg-severity-severe/10 text-severity-severe border border-severity-severe/20";
       case "critical":
-        return "bg-severity-critical text-severity-critical-foreground";
+        return "bg-severity-critical/10 text-severity-critical border border-severity-critical/20";
       default:
         return "bg-secondary text-secondary-foreground";
     }
@@ -174,7 +174,7 @@ export default function Report() {
             <div className="space-y-4">
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Predicted Disease</p>
-                <p className="text-2xl font-bold text-medical">{report.predicted_disease}</p>
+                <p className="text-2xl font-bold text-primary">{report.predicted_disease}</p>
               </div>
               
               <div className="flex gap-4 flex-wrap">

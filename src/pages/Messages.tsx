@@ -54,7 +54,8 @@ export default function Messages() {
   useEffect(() => {
     if (selectedConversation) {
       fetchMessages(selectedConversation);
-      subscribeToMessages(selectedConversation);
+      const cleanup = subscribeToMessages(selectedConversation);
+      return cleanup;
     }
   }, [selectedConversation]);
 
