@@ -82,7 +82,7 @@ export default function NavBar() {
                     isActive("/diagnose") ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
-                  Diagnose
+                  {t("nav.diagnose")}
                 </Link>
                 <Link
                   to="/veterinarians"
@@ -90,7 +90,7 @@ export default function NavBar() {
                     isActive("/veterinarians") ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
-                  Find Vets
+                  {t("nav.findVets")}
                 </Link>
               </>
             )}
@@ -101,7 +101,7 @@ export default function NavBar() {
                   isActive("/vet-profile") ? "text-primary" : "text-muted-foreground"
                 }`}
               >
-                My Clinic
+                {t("nav.myClinic")}
               </Link>
             )}
             <Link
