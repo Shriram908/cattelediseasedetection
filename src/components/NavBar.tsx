@@ -101,7 +101,7 @@ export default function NavBar() {
                   isActive("/vet-profile") ? "text-primary" : "text-muted-foreground"
                 }`}
               >
-                My Clinic
+                {t("nav.myClinic")}
               </Link>
             )}
             <Link
