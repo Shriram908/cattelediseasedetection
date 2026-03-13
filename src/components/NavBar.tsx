@@ -90,7 +90,7 @@ export default function NavBar() {
                     isActive("/veterinarians") ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
-                  Find Vets
+                  {t("nav.findVets")}
                 </Link>
               </>
             )}
