@@ -82,7 +82,7 @@ export default function NavBar() {
                     isActive("/diagnose") ? "text-primary" : "text-muted-foreground"
                   }`}
                 >
-                  Diagnose
+                  {t("nav.diagnose")}
                 </Link>
                 <Link
                   to="/veterinarians"
