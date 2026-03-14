@@ -95,18 +95,22 @@ export default function Report() {
   });
 
   const parseNotes = (notes: string | null) => {
-    if (!notes) return { duration: "", remedies: [] as string[], precautions: [] as string[] };
+    if (!notes) return { duration: "", firstAid: [] as string[], remedies: [] as string[], precautions: [] as string[] };
     const lines = notes.split("\n");
     const duration = lines.find(l => l.startsWith("Duration:"))?.replace("Duration:", "").trim() || "";
+    const firstAidStart = lines.findIndex(l => l.includes("First Aid:"));
     const remediesStart = lines.findIndex(l => l.includes("Home Remedies:"));
     const precautionsStart = lines.findIndex(l => l.includes("Precautions:"));
+    const firstAid = firstAidStart >= 0
+      ? lines.slice(firstAidStart + 1, remediesStart >= 0 ? remediesStart : precautionsStart >= 0 ? precautionsStart : undefined).filter(l => l.trim())
+      : [];
     const remedies = remediesStart >= 0
       ? lines.slice(remediesStart + 1, precautionsStart >= 0 ? precautionsStart : undefined).filter(l => l.trim())
       : [];
     const precautions = precautionsStart >= 0
       ? lines.slice(precautionsStart + 1).filter(l => l.trim())
       : [];
-    return { duration, remedies, precautions };
+    return { duration, firstAid, remedies, precautions };
   };
 
   const { duration, remedies, precautions } = parseNotes(report?.treatment_notes ?? null);
