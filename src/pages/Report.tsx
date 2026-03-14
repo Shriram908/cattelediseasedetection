@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Loader2, ArrowLeft, Printer, AlertCircle, Stethoscope,
   ShieldAlert, Heart, Clock, Home, ShieldCheck, Bug,
-  CheckCircle2, AlertTriangle, XCircle, Activity, FileText
+  CheckCircle2, AlertTriangle, XCircle, Activity, FileText, Zap
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useState, useEffect } from "react";
