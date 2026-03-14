@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, LogOut, Menu, X, User, MessageSquare, Calendar, Syringe } from "lucide-react";
+import { Stethoscope, LogOut, Menu, X, User, MessageSquare, Syringe } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/lib/i18n";
 
