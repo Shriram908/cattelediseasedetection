@@ -141,6 +141,8 @@ const translations: Record<Language, Record<string, string>> = {
     "report.years": "years",
     "report.kg": "kg",
     "report.importantNote": "Important: If symptoms worsen or new symptoms appear, contact a veterinarian immediately.",
+    "report.firstAidTitle": "⚡ Immediate First Aid",
+    "report.firstAidDesc": "Do these steps RIGHT NOW before a veterinarian arrives. Quick action can save your animal's life.",
 
     // Profile
     "profile.title": "My Profile",
