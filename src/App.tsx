@@ -11,8 +11,6 @@ import Diagnose from "./pages/Diagnose";
 import CattleNew from "./pages/CattleNew";
 import CattleEdit from "./pages/CattleEdit";
 import Report from "./pages/Report";
-import Veterinarians from "./pages/Veterinarians";
-import VetProfile from "./pages/VetProfile";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import Appointments from "./pages/Appointments";
