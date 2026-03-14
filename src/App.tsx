@@ -13,8 +13,6 @@ import CattleEdit from "./pages/CattleEdit";
 import Report from "./pages/Report";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
-import Appointments from "./pages/Appointments";
-import AppointmentNew from "./pages/AppointmentNew";
 import Vaccinations from "./pages/Vaccinations";
 import NotFound from "./pages/NotFound";
 
