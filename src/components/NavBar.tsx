@@ -11,7 +11,7 @@ export default function NavBar() {
   const location = useLocation();
   const { t } = useI18n();
   const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
