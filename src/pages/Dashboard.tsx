@@ -422,7 +422,7 @@ const Dashboard = () => {
             </TabsContent>
 
             <TabsContent value="reports" className="space-y-4">
-              <h2 className="text-2xl font-bold">Recent Diagnoses</h2>
+              <h2 className="text-2xl font-bold">{t("dashboard.recentDiagnoses")}</h2>
 
               {reports.length === 0 ? (
                 <Card>
