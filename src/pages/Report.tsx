@@ -113,7 +113,7 @@ export default function Report() {
     return { duration, firstAid, remedies, precautions };
   };
 
-  const { duration, remedies, precautions } = parseNotes(report?.treatment_notes ?? null);
+  const { duration, firstAid, remedies, precautions } = parseNotes(report?.treatment_notes ?? null);
 
   // Translate dynamic content
   const allTexts = [...remedies, ...precautions, duration, report?.predicted_disease || ""].filter(Boolean);
