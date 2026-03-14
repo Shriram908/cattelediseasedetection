@@ -62,7 +62,7 @@ serve(async (req) => {
   "precautions": ["precaution1", "precaution2", "precaution3"]
 }
 
-For "first_aid", provide 3-5 immediate emergency steps a farmer should take RIGHT NOW before a vet arrives. These should be simple, actionable steps like isolating the animal, providing clean water, keeping the animal calm, etc.`;
+For "first_aid", provide 3-5 immediate emergency steps a farmer should take RIGHT NOW before a vet arrives. These should be simple, actionable steps like isolating the animal, providing clean water, keeping the animal calm, etc.
 
 Consider: Lumpy Skin Disease, Mastitis, Foot-and-Mouth Disease, Foot Rot, Bloat, Pneumonia, Blackleg, Coccidiosis, Bovine Dermatophilosis, Ringworm, Bovine Papillomatosis, Rumen Acidosis, and others.
 Respond ONLY with valid JSON.`;
