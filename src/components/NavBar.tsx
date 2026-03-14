@@ -74,36 +74,14 @@ export default function NavBar() {
             >
               {t("nav.dashboard")}
             </Link>
-            {userRole === "farmer" && (
-              <>
-                <Link
-                  to="/diagnose"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive("/diagnose") ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  {t("nav.diagnose")}
-                </Link>
-                <Link
-                  to="/veterinarians"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive("/veterinarians") ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  {t("nav.findVets")}
-                </Link>
-              </>
-            )}
-            {userRole === "veterinarian" && (
-              <Link
-                to="/vet-profile"
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActive("/vet-profile") ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                {t("nav.myClinic")}
-              </Link>
-            )}
+            <Link
+              to="/diagnose"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/diagnose") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              {t("nav.diagnose")}
+            </Link>
             <Link
               to="/messages"
               className={`text-sm font-medium transition-colors hover:text-primary ${
