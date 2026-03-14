@@ -337,7 +337,30 @@ export default function Report() {
             </Card>
           )}
 
-          {translatedRemedies.length > 0 && (
+          {translatedFirstAid.length > 0 && (
+            <Card className="border-2 border-destructive/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Zap className="h-5 w-5 text-destructive" />
+                  {t("report.firstAidTitle")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{t("report.firstAidDesc")}</p>
+                <ul className="space-y-3">
+                  {translatedFirstAid.map((step, idx) => (
+                    <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-destructive/5 border border-destructive/10">
+                      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-destructive/15 text-destructive font-bold text-sm flex items-center justify-center">
+                        {idx + 1}
+                      </span>
+                      <span className="text-sm leading-relaxed pt-0.5">{step}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
