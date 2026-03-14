@@ -132,21 +132,9 @@ export default function NavBar() {
               <Link to="/dashboard" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                 {t("nav.dashboard")}
               </Link>
-              {userRole === "farmer" && (
-                <>
-                  <Link to="/diagnose" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.diagnose")}
-                  </Link>
-                  <Link to="/veterinarians" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.findVets")}
-                  </Link>
-                </>
-              )}
-              {userRole === "veterinarian" && (
-                <Link to="/vet-profile" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                  {t("nav.myClinic")}
-                </Link>
-              )}
+              <Link to="/diagnose" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+                {t("nav.diagnose")}
+              </Link>
               <Link to="/messages" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                 {t("nav.messages")}
               </Link>
