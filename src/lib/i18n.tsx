@@ -213,13 +213,13 @@ const translations: Record<Language, Record<string, string>> = {
     "apt.complete": "Complete",
     "apt.cancelApt": "Cancel",
 
-    // Messages
-    "msg.title": "Messages",
-    "msg.subtitle": "Chat with veterinarians and farmers",
+    // Messages / AI Chat
+    "msg.title": "CattleCare AI Assistant",
+    "msg.subtitle": "Ask me anything about cattle health, diseases, and care",
     "msg.conversations": "Conversations",
     "msg.noConversations": "No conversations yet",
     "msg.selectConversation": "Select a conversation to start messaging",
-    "msg.typeMessage": "Type a message...",
+    "msg.typeMessage": "Ask about cattle health, diseases, remedies...",
 
     // Common
     "common.loading": "Loading...",
