@@ -779,6 +779,8 @@ const translations: Record<Language, Record<string, string>> = {
     "report.years": "वर्षे",
     "report.kg": "किग्रॅ",
     "report.importantNote": "महत्त्वाचे: लक्षणे बिघडल्यास किंवा नवीन लक्षणे दिसल्यास, तातडीने पशुवैद्याशी संपर्क साधा.",
+    "report.firstAidTitle": "⚡ तात्काळ प्रथमोपचार",
+    "report.firstAidDesc": "पशुवैद्य येण्यापूर्वी आत्ताच हे करा. त्वरित कृती तुमच्या जनावराचे प्राण वाचवू शकते.",
 
     // Profile
     "profile.title": "माझे प्रोफाइल",
