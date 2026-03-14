@@ -16,17 +16,15 @@ interface ChatMessage {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/cattle-chat`;
 
-const QUICK_QUESTIONS = [
-  "What are symptoms of Lumpy Skin Disease?",
-  "My cow is not eating, what should I do?",
-  "How to prevent Foot-and-Mouth Disease?",
-  "What vaccines does my cattle need?",
-  "My cattle has swelling on legs, what could it be?",
-];
+const LANG_SYSTEM_PROMPTS: Record<string, string> = {
+  en: "You are a veterinary AI expert. Always respond in English.",
+  hi: "You are a veterinary AI expert. Always respond in Hindi (हिंदी). Use Devanagari script.",
+  mr: "You are a veterinary AI expert. Always respond in Marathi (मराठी). Use Devanagari script.",
+};
 
 export default function Messages() {
   const { toast } = useToast();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +36,10 @@ export default function Messages() {
     }
   }, [messages]);
 
+  const quickQuestions = [
+    t("msg.q1"), t("msg.q2"), t("msg.q3"), t("msg.q4"), t("msg.q5"),
+  ];
+
   const streamChat = async (allMessages: ChatMessage[]) => {
     const resp = await fetch(CHAT_URL, {
       method: "POST",
@@ -45,7 +47,11 @@ export default function Messages() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: allMessages }),
+      body: JSON.stringify({
+        messages: allMessages,
+        language,
+        systemPrompt: LANG_SYSTEM_PROMPTS[language] || LANG_SYSTEM_PROMPTS.en,
+      }),
     });
 
     if (!resp.ok) {
@@ -121,9 +127,9 @@ export default function Messages() {
         <div className="mb-6 text-center">
           <div className="inline-flex items-center gap-2 mb-2">
             <Bot className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold text-foreground">CattleCare AI Assistant</h1>
+            <h1 className="text-3xl font-bold text-foreground">{t("msg.title")}</h1>
           </div>
-          <p className="text-muted-foreground">Ask me anything about cattle health, diseases, and care</p>
+          <p className="text-muted-foreground">{t("msg.subtitle")}</p>
         </div>
 
         <Card className="flex flex-col h-[calc(100vh-16rem)]">
@@ -132,11 +138,11 @@ export default function Messages() {
               {messages.length === 0 && (
                 <div className="text-center py-8">
                   <Bot className="h-16 w-16 mx-auto mb-4 text-primary/40" />
-                  <p className="text-muted-foreground mb-6">Start a conversation or try a quick question:</p>
+                  <p className="text-muted-foreground mb-6">{t("msg.startConversation")}</p>
                   <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto">
-                    {QUICK_QUESTIONS.map((q) => (
+                    {quickQuestions.map((q, i) => (
                       <button
-                        key={q}
+                        key={i}
                         onClick={() => handleSend(q)}
                         className="text-sm px-3 py-2 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors text-left"
                       >
@@ -193,7 +199,7 @@ export default function Messages() {
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about cattle health, diseases, remedies..."
+                placeholder={t("msg.typeMessage")}
                 disabled={isLoading}
                 className="rounded-full"
               />
