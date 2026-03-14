@@ -514,6 +514,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      vet_has_notes_on_report: {
+        Args: { _report_id: string; _vet_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "farmer" | "veterinarian"
