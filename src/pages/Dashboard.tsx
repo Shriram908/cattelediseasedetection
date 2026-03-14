@@ -404,7 +404,7 @@ const Dashboard = () => {
                             variant="outline"
                             onClick={() => navigate(`/diagnose?cattle=${animal.id}`)}
                           >
-                            Diagnose
+                            {t("dashboard.diagnoseBtn")}
                           </Button>
                           <Button
                             variant="ghost"
