@@ -11,40 +11,19 @@ export default function NavBar() {
   const location = useLocation();
   const { t } = useI18n();
   const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserRole(session.user.id);
-      } else {
-        setUserRole(null);
-      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
-
-  const fetchUserRole = async (userId: string) => {
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .single();
-    
-    if (!error && data) {
-      setUserRole(data.role);
-    }
-  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -126,33 +105,33 @@ export default function NavBar() {
           </button>
         </div>
 
-          {/* Mobile Navigation */}
-          {mobileMenuOpen && (
-            <div className="md:hidden py-4 space-y-3 border-t">
-              <Link to="/dashboard" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                {t("nav.dashboard")}
-              </Link>
-              <Link to="/diagnose" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                {t("nav.diagnose")}
-              </Link>
-              <Link to="/messages" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                {t("nav.messages")}
-              </Link>
-              <Link to="/vaccinations" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                {t("nav.vaccinations")}
-              </Link>
-              <Link to="/profile" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                {t("nav.profile")}
-              </Link>
-              <div className="flex items-center gap-2">
-                <LanguageSwitcher />
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="w-full justify-start">
-                <LogOut className="h-4 w-4 mr-2" />
-                {t("nav.logout")}
-              </Button>
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <div className="md:hidden py-4 space-y-3 border-t">
+            <Link to="/dashboard" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+              {t("nav.dashboard")}
+            </Link>
+            <Link to="/diagnose" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+              {t("nav.diagnose")}
+            </Link>
+            <Link to="/messages" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+              {t("nav.messages")}
+            </Link>
+            <Link to="/vaccinations" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+              {t("nav.vaccinations")}
+            </Link>
+            <Link to="/profile" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+              {t("nav.profile")}
+            </Link>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
             </div>
-          )}
+            <Button variant="ghost" size="sm" onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="w-full justify-start">
+              <LogOut className="h-4 w-4 mr-2" />
+              {t("nav.logout")}
+            </Button>
+          </div>
+        )}
       </div>
     </nav>
   );
