@@ -344,7 +344,7 @@ const Dashboard = () => {
                 ))}
               </div>
               <Button variant="outline" className="mt-4" onClick={() => navigate("/vaccinations")}>
-                <Syringe className="mr-2 h-4 w-4" /> Manage Vaccinations
+                <Syringe className="mr-2 h-4 w-4" /> {t("dashboard.manageVaccinations")}
               </Button>
             </CardContent>
           </Card>
