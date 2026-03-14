@@ -296,8 +296,8 @@ const Dashboard = () => {
         {userRole === "veterinarian" && appointments.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">Upcoming Appointments</h2>
-              <Button variant="outline" onClick={() => navigate("/appointments")}>View All</Button>
+              <h2 className="text-2xl font-bold">{t("dashboard.upcomingAppointments")}</h2>
+              <Button variant="outline" onClick={() => navigate("/appointments")}>{t("dashboard.viewAll")}</Button>
             </div>
             <div className="space-y-3">
               {appointments.map((apt) => (
