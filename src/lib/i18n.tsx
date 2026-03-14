@@ -141,6 +141,8 @@ const translations: Record<Language, Record<string, string>> = {
     "report.years": "years",
     "report.kg": "kg",
     "report.importantNote": "Important: If symptoms worsen or new symptoms appear, contact a veterinarian immediately.",
+    "report.firstAidTitle": "⚡ Immediate First Aid",
+    "report.firstAidDesc": "Do these steps RIGHT NOW before a veterinarian arrives. Quick action can save your animal's life.",
 
     // Profile
     "profile.title": "My Profile",
@@ -458,6 +460,8 @@ const translations: Record<Language, Record<string, string>> = {
     "report.years": "वर्ष",
     "report.kg": "किग्रा",
     "report.importantNote": "महत्वपूर्ण: यदि लक्षण बिगड़ते हैं या नए लक्षण दिखते हैं, तो तुरंत पशु चिकित्सक से संपर्क करें।",
+    "report.firstAidTitle": "⚡ तत्काल प्राथमिक उपचार",
+    "report.firstAidDesc": "पशु चिकित्सक के आने से पहले अभी ये कदम उठाएं। तुरंत कार्रवाई आपके पशु की जान बचा सकती है।",
 
     // Profile
     "profile.title": "मेरी प्रोफ़ाइल",
@@ -775,6 +779,8 @@ const translations: Record<Language, Record<string, string>> = {
     "report.years": "वर्षे",
     "report.kg": "किग्रॅ",
     "report.importantNote": "महत्त्वाचे: लक्षणे बिघडल्यास किंवा नवीन लक्षणे दिसल्यास, तातडीने पशुवैद्याशी संपर्क साधा.",
+    "report.firstAidTitle": "⚡ तात्काळ प्रथमोपचार",
+    "report.firstAidDesc": "पशुवैद्य येण्यापूर्वी आत्ताच हे करा. त्वरित कृती तुमच्या जनावराचे प्राण वाचवू शकते.",
 
     // Profile
     "profile.title": "माझे प्रोफाइल",

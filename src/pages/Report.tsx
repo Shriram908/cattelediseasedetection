@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Loader2, ArrowLeft, Printer, AlertCircle, Stethoscope,
   ShieldAlert, Heart, Clock, Home, ShieldCheck, Bug,
-  CheckCircle2, AlertTriangle, XCircle, Activity, FileText
+  CheckCircle2, AlertTriangle, XCircle, Activity, FileText, Zap
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useState, useEffect } from "react";
@@ -95,31 +95,36 @@ export default function Report() {
   });
 
   const parseNotes = (notes: string | null) => {
-    if (!notes) return { duration: "", remedies: [] as string[], precautions: [] as string[] };
+    if (!notes) return { duration: "", firstAid: [] as string[], remedies: [] as string[], precautions: [] as string[] };
     const lines = notes.split("\n");
     const duration = lines.find(l => l.startsWith("Duration:"))?.replace("Duration:", "").trim() || "";
+    const firstAidStart = lines.findIndex(l => l.includes("First Aid:"));
     const remediesStart = lines.findIndex(l => l.includes("Home Remedies:"));
     const precautionsStart = lines.findIndex(l => l.includes("Precautions:"));
+    const firstAid = firstAidStart >= 0
+      ? lines.slice(firstAidStart + 1, remediesStart >= 0 ? remediesStart : precautionsStart >= 0 ? precautionsStart : undefined).filter(l => l.trim())
+      : [];
     const remedies = remediesStart >= 0
       ? lines.slice(remediesStart + 1, precautionsStart >= 0 ? precautionsStart : undefined).filter(l => l.trim())
       : [];
     const precautions = precautionsStart >= 0
       ? lines.slice(precautionsStart + 1).filter(l => l.trim())
       : [];
-    return { duration, remedies, precautions };
+    return { duration, firstAid, remedies, precautions };
   };
 
-  const { duration, remedies, precautions } = parseNotes(report?.treatment_notes ?? null);
+  const { duration, firstAid, remedies, precautions } = parseNotes(report?.treatment_notes ?? null);
 
   // Translate dynamic content
-  const allTexts = [...remedies, ...precautions, duration, report?.predicted_disease || ""].filter(Boolean);
+  const allTexts = [...firstAid, ...remedies, ...precautions, duration, report?.predicted_disease || ""].filter(Boolean);
   const { translated: translatedTexts, isTranslating } = useTranslatedContent(allTexts, language);
 
   // Split translated texts back
-  const translatedRemedies = translatedTexts.slice(0, remedies.length);
-  const translatedPrecautions = translatedTexts.slice(remedies.length, remedies.length + precautions.length);
-  const translatedDuration = translatedTexts[remedies.length + precautions.length] || duration;
-  const translatedDisease = translatedTexts[remedies.length + precautions.length + 1] || report?.predicted_disease || "";
+  const translatedFirstAid = translatedTexts.slice(0, firstAid.length);
+  const translatedRemedies = translatedTexts.slice(firstAid.length, firstAid.length + remedies.length);
+  const translatedPrecautions = translatedTexts.slice(firstAid.length + remedies.length, firstAid.length + remedies.length + precautions.length);
+  const translatedDuration = translatedTexts[firstAid.length + remedies.length + precautions.length] || duration;
+  const translatedDisease = translatedTexts[firstAid.length + remedies.length + precautions.length + 1] || report?.predicted_disease || "";
 
   const handlePrint = () => window.print();
 
@@ -328,6 +333,30 @@ export default function Report() {
               <CardContent>
                 <p className="text-lg font-semibold">{translatedDuration}</p>
                 <p className="text-sm text-muted-foreground mt-1">{t("report.recoveryNote")}</p>
+              </CardContent>
+            </Card>
+          )}
+
+          {translatedFirstAid.length > 0 && (
+            <Card className="border-2 border-destructive/20">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Zap className="h-5 w-5 text-destructive" />
+                  {t("report.firstAidTitle")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">{t("report.firstAidDesc")}</p>
+                <ul className="space-y-3">
+                  {translatedFirstAid.map((step, idx) => (
+                    <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-destructive/5 border border-destructive/10">
+                      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-destructive/15 text-destructive font-bold text-sm flex items-center justify-center">
+                        {idx + 1}
+                      </span>
+                      <span className="text-sm leading-relaxed pt-0.5">{step}</span>
+                    </li>
+                  ))}
+                </ul>
               </CardContent>
             </Card>
           )}

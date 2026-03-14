@@ -57,9 +57,12 @@ serve(async (req) => {
   "urgency": "Low|Medium|High|Critical",
   "treatment_duration": "string",
   "description": "string (2-3 sentences explaining the disease in simple language)",
+  "first_aid": ["step1", "step2", "step3"],
   "home_remedies": ["remedy1", "remedy2", "remedy3"],
   "precautions": ["precaution1", "precaution2", "precaution3"]
 }
+
+For "first_aid", provide 3-5 immediate emergency steps a farmer should take RIGHT NOW before a vet arrives. These should be simple, actionable steps like isolating the animal, providing clean water, keeping the animal calm, etc.`;
 
 Consider: Lumpy Skin Disease, Mastitis, Foot-and-Mouth Disease, Foot Rot, Bloat, Pneumonia, Blackleg, Coccidiosis, Bovine Dermatophilosis, Ringworm, Bovine Papillomatosis, Rumen Acidosis, and others.
 Respond ONLY with valid JSON.`;
@@ -145,7 +148,7 @@ Respond ONLY with valid JSON.`;
         ml_model_used: "Lovable AI - Gemini 2.5 Flash",
         severity: diagnosis.severity,
         veterinarian_recommended: diagnosis.veterinarian_required,
-        treatment_notes: `Duration: ${diagnosis.treatment_duration}\n\nHome Remedies:\n${diagnosis.home_remedies.join("\n")}\n\nPrecautions:\n${diagnosis.precautions.join("\n")}`,
+        treatment_notes: `Duration: ${diagnosis.treatment_duration}\n\nFirst Aid:\n${(diagnosis.first_aid || []).join("\n")}\n\nHome Remedies:\n${diagnosis.home_remedies.join("\n")}\n\nPrecautions:\n${diagnosis.precautions.join("\n")}`,
       })
       .select()
       .single();
