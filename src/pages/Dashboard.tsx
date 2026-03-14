@@ -326,7 +326,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-warning">
                 <AlertCircle className="h-5 w-5" />
-                Vaccination Reminders
+                {t("dashboard.vaccinationReminders")}
               </CardTitle>
             </CardHeader>
             <CardContent>
