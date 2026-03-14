@@ -101,7 +101,7 @@ export default function AppointmentNew() {
       const { error } = await supabase.from("appointments").insert({
         farmer_id: user.id,
         vet_id: formData.vet_id,
-        cattle_id: formData.cattle_id || null,
+        cattle_id: formData.cattle_id && formData.cattle_id !== "none" ? formData.cattle_id : null,
         appointment_date: appointmentDateTime.toISOString(),
         reason: formData.reason,
         notes: formData.notes || null,
