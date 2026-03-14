@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { useToast } from "@/hooks/use-toast";
-import { Activity, User, Stethoscope } from "lucide-react";
+import { Activity } from "lucide-react";
 import { Session } from "@supabase/supabase-js";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/lib/i18n";
@@ -25,7 +25,7 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState("farmer");
+  const role = "farmer";
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
@@ -144,31 +144,6 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">{t("auth.password")}</Label>
                     <Input id="signup-password" type="password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required minLength={6} />
-                  </div>
-                  <div className="space-y-3">
-                    <Label>{t("auth.accountType")}</Label>
-                    <RadioGroup value={role} onValueChange={setRole}>
-                      <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                        <RadioGroupItem value="farmer" id="farmer" />
-                        <Label htmlFor="farmer" className="flex items-center gap-2 cursor-pointer flex-1">
-                          <User className="h-4 w-4 text-primary" />
-                          <div>
-                            <div className="font-medium">{t("auth.farmer")}</div>
-                            <div className="text-xs text-muted-foreground">{t("auth.farmerDesc")}</div>
-                          </div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 border rounded-lg hover:bg-muted/50 cursor-pointer">
-                        <RadioGroupItem value="veterinarian" id="veterinarian" />
-                        <Label htmlFor="veterinarian" className="flex items-center gap-2 cursor-pointer flex-1">
-                          <Stethoscope className="h-4 w-4 text-secondary" />
-                          <div>
-                            <div className="font-medium">{t("auth.veterinarian")}</div>
-                            <div className="text-xs text-muted-foreground">{t("auth.vetDesc")}</div>
-                          </div>
-                        </Label>
-                      </div>
-                    </RadioGroup>
                   </div>
                 </CardContent>
                 <CardFooter>

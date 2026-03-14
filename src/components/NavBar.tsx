@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, LogOut, Menu, X, User, MessageSquare, Calendar, Syringe } from "lucide-react";
+import { Stethoscope, LogOut, Menu, X, User, MessageSquare, Syringe } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/lib/i18n";
 
@@ -74,36 +74,14 @@ export default function NavBar() {
             >
               {t("nav.dashboard")}
             </Link>
-            {userRole === "farmer" && (
-              <>
-                <Link
-                  to="/diagnose"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive("/diagnose") ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  {t("nav.diagnose")}
-                </Link>
-                <Link
-                  to="/veterinarians"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive("/veterinarians") ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  {t("nav.findVets")}
-                </Link>
-              </>
-            )}
-            {userRole === "veterinarian" && (
-              <Link
-                to="/vet-profile"
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActive("/vet-profile") ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                {t("nav.myClinic")}
-              </Link>
-            )}
+            <Link
+              to="/diagnose"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/diagnose") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              {t("nav.diagnose")}
+            </Link>
             <Link
               to="/messages"
               className={`text-sm font-medium transition-colors hover:text-primary ${
@@ -112,36 +90,14 @@ export default function NavBar() {
             >
               <MessageSquare className="h-4 w-4" />
             </Link>
-            {userRole === "farmer" && (
-              <>
-                <Link
-                  to="/appointments"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive("/appointments") ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  <Calendar className="h-4 w-4" />
-                </Link>
-                <Link
-                  to="/vaccinations"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive("/vaccinations") ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  <Syringe className="h-4 w-4" />
-                </Link>
-              </>
-            )}
-            {userRole === "veterinarian" && (
-              <Link
-                to="/appointments"
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActive("/appointments") ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                <Calendar className="h-4 w-4" />
-              </Link>
-            )}
+            <Link
+              to="/vaccinations"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/vaccinations") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <Syringe className="h-4 w-4" />
+            </Link>
             <Link
               to="/profile"
               className={`text-sm font-medium transition-colors hover:text-primary ${
@@ -176,39 +132,15 @@ export default function NavBar() {
               <Link to="/dashboard" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                 {t("nav.dashboard")}
               </Link>
-              {userRole === "farmer" && (
-                <>
-                  <Link to="/diagnose" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.diagnose")}
-                  </Link>
-                  <Link to="/veterinarians" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.findVets")}
-                  </Link>
-                </>
-              )}
-              {userRole === "veterinarian" && (
-                <Link to="/vet-profile" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                  {t("nav.myClinic")}
-                </Link>
-              )}
+              <Link to="/diagnose" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+                {t("nav.diagnose")}
+              </Link>
               <Link to="/messages" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                 {t("nav.messages")}
               </Link>
-              {userRole === "farmer" && (
-                <>
-                  <Link to="/appointments" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.appointments")}
-                  </Link>
-                  <Link to="/vaccinations" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.vaccinations")}
-                  </Link>
-                </>
-              )}
-              {userRole === "veterinarian" && (
-                <Link to="/appointments" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                  {t("nav.appointments")}
-                </Link>
-              )}
+              <Link to="/vaccinations" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+                {t("nav.vaccinations")}
+              </Link>
               <Link to="/profile" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                 {t("nav.profile")}
               </Link>
