@@ -9,11 +9,11 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
+    const { messages, systemPrompt: clientSystemPrompt } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are CattleCare AI, an expert veterinary assistant specializing in cattle health and diseases. You help farmers with:
+    const basePrompt = `You are CattleCare AI, an expert veterinary assistant specializing in cattle health and diseases. You help farmers with:
 - Identifying cattle diseases based on described symptoms
 - Providing home remedies and first-aid advice
 - Recommending when to consult a veterinarian
@@ -23,6 +23,10 @@ serve(async (req) => {
 Be friendly, empathetic, and use simple language. If symptoms sound severe or life-threatening, strongly recommend consulting a veterinarian immediately. Always clarify you are an AI assistant and not a replacement for professional veterinary care.
 
 Keep responses concise but informative. Use bullet points for remedies and precautions.`;
+
+    const systemPrompt = clientSystemPrompt
+      ? `${basePrompt}\n\nIMPORTANT LANGUAGE INSTRUCTION: ${clientSystemPrompt}`
+      : basePrompt;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
