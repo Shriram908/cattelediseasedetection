@@ -11,6 +11,7 @@ import {
   CheckCircle2, AlertTriangle, XCircle, Activity, FileText
 } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { useState, useEffect } from "react";
 
 const SeverityIcon = ({ severity }: { severity: string }) => {
   switch (severity?.toLowerCase()) {
@@ -35,10 +36,49 @@ const SeverityBar = ({ severity }: { severity: string }) => {
   );
 };
 
+function useTranslatedContent(texts: string[], language: string) {
+  const [translated, setTranslated] = useState<string[]>(texts);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const cacheKey = `${language}-${texts.join("|")}`;
+
+  useEffect(() => {
+    if (language === "en" || texts.length === 0 || texts.every(t => !t.trim())) {
+      setTranslated(texts);
+      return;
+    }
+
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      try { setTranslated(JSON.parse(cached)); return; } catch {}
+    }
+
+    setIsTranslating(true);
+    fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-content`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ texts, targetLanguage: language }),
+    })
+      .then(r => r.json())
+      .then(data => {
+        if (data.translated && Array.isArray(data.translated)) {
+          setTranslated(data.translated);
+          sessionStorage.setItem(cacheKey, JSON.stringify(data.translated));
+        }
+      })
+      .catch(() => setTranslated(texts))
+      .finally(() => setIsTranslating(false));
+  }, [cacheKey, language, texts.length]);
+
+  return { translated, isTranslating };
+}
+
 export default function Report() {
   const { reportId } = useParams<{ reportId: string }>();
   const navigate = useNavigate();
-  const { t } = useI18n();
+  const { t, language } = useI18n();
 
   const { data: report, isLoading } = useQuery({
     queryKey: ["report", reportId],
@@ -54,6 +94,33 @@ export default function Report() {
     enabled: !!reportId,
   });
 
+  const parseNotes = (notes: string | null) => {
+    if (!notes) return { duration: "", remedies: [] as string[], precautions: [] as string[] };
+    const lines = notes.split("\n");
+    const duration = lines.find(l => l.startsWith("Duration:"))?.replace("Duration:", "").trim() || "";
+    const remediesStart = lines.findIndex(l => l.includes("Home Remedies:"));
+    const precautionsStart = lines.findIndex(l => l.includes("Precautions:"));
+    const remedies = remediesStart >= 0
+      ? lines.slice(remediesStart + 1, precautionsStart >= 0 ? precautionsStart : undefined).filter(l => l.trim())
+      : [];
+    const precautions = precautionsStart >= 0
+      ? lines.slice(precautionsStart + 1).filter(l => l.trim())
+      : [];
+    return { duration, remedies, precautions };
+  };
+
+  const { duration, remedies, precautions } = parseNotes(report?.treatment_notes ?? null);
+
+  // Translate dynamic content
+  const allTexts = [...remedies, ...precautions, duration, report?.predicted_disease || ""].filter(Boolean);
+  const { translated: translatedTexts, isTranslating } = useTranslatedContent(allTexts, language);
+
+  // Split translated texts back
+  const translatedRemedies = translatedTexts.slice(0, remedies.length);
+  const translatedPrecautions = translatedTexts.slice(remedies.length, remedies.length + precautions.length);
+  const translatedDuration = translatedTexts[remedies.length + precautions.length] || duration;
+  const translatedDisease = translatedTexts[remedies.length + precautions.length + 1] || report?.predicted_disease || "";
+
   const handlePrint = () => window.print();
 
   if (isLoading) {
@@ -61,7 +128,7 @@ export default function Report() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-3">
           <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground">{t("report.loading") || "Loading..."}</p>
+          <p className="text-muted-foreground">{t("common.loading")}</p>
         </div>
       </div>
     );
@@ -101,33 +168,17 @@ export default function Report() {
     }
   };
 
-  const parseNotes = (notes: string | null) => {
-    if (!notes) return { duration: "", remedies: [] as string[], precautions: [] as string[] };
-    const lines = notes.split("\n");
-    const duration = lines.find(l => l.startsWith("Duration:"))?.replace("Duration:", "").trim() || "";
-    const remediesStart = lines.findIndex(l => l.includes("Home Remedies:"));
-    const precautionsStart = lines.findIndex(l => l.includes("Precautions:"));
-    const remedies = remediesStart >= 0
-      ? lines.slice(remediesStart + 1, precautionsStart >= 0 ? precautionsStart : undefined).filter(l => l.trim())
-      : [];
-    const precautions = precautionsStart >= 0
-      ? lines.slice(precautionsStart + 1).filter(l => l.trim())
-      : [];
-    return { duration, remedies, precautions };
-  };
-
-  const { duration, remedies, precautions } = parseNotes(report.treatment_notes);
   const confidencePercent = Math.round(report.confidence_score * 100);
-  const diagnosisDate = new Date(report.diagnosis_date).toLocaleDateString("en-IN", {
-    day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit"
-  });
+  const diagnosisDate = new Date(report.diagnosis_date).toLocaleDateString(
+    language === "hi" ? "hi-IN" : language === "mr" ? "mr-IN" : "en-IN",
+    { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" }
+  );
 
   return (
     <div className="min-h-screen bg-background">
       <div className="print:hidden"><NavBar /></div>
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">
-        {/* Screen-only header */}
         <div className="mb-6 print:hidden">
           <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />{t("report.backDashboard")}
@@ -140,7 +191,6 @@ export default function Report() {
           </div>
         </div>
 
-        {/* Print-only header */}
         <div className="hidden print:block mb-6 border-b-2 border-primary pb-4">
           <div className="flex items-center gap-3 mb-2">
             <Stethoscope className="h-8 w-8 text-primary" />
@@ -152,8 +202,14 @@ export default function Report() {
           <p className="text-xs text-muted-foreground">{t("report.generatedOn")}: {diagnosisDate}</p>
         </div>
 
+        {isTranslating && (
+          <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground justify-center">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>{t("common.loading")}</span>
+          </div>
+        )}
+
         <div className="space-y-5">
-          {/* ===== ALERT BANNER ===== */}
           {report.veterinarian_recommended && (
             <div className="rounded-lg border-2 border-severity-critical/40 bg-severity-critical/5 p-4 flex items-start gap-3">
               <ShieldAlert className="h-6 w-6 text-severity-critical flex-shrink-0 mt-0.5" />
@@ -164,7 +220,6 @@ export default function Report() {
             </div>
           )}
 
-          {/* ===== ANIMAL DETAILS ===== */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -202,7 +257,6 @@ export default function Report() {
             </CardContent>
           </Card>
 
-          {/* ===== DIAGNOSIS RESULT ===== */}
           <Card className="border-2 border-primary/20">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
@@ -213,7 +267,7 @@ export default function Report() {
             <CardContent className="space-y-5">
               <div className="text-center py-3 rounded-lg bg-primary/5">
                 <p className="text-sm text-muted-foreground mb-1">{t("report.detectedDisease")}</p>
-                <p className="text-3xl font-bold text-primary">{report.predicted_disease}</p>
+                <p className="text-3xl font-bold text-primary">{translatedDisease}</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -263,8 +317,7 @@ export default function Report() {
             </CardContent>
           </Card>
 
-          {/* ===== TREATMENT DURATION ===== */}
-          {duration && (
+          {translatedDuration && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -273,14 +326,13 @@ export default function Report() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-lg font-semibold">{duration}</p>
+                <p className="text-lg font-semibold">{translatedDuration}</p>
                 <p className="text-sm text-muted-foreground mt-1">{t("report.recoveryNote")}</p>
               </CardContent>
             </Card>
           )}
 
-          {/* ===== HOME REMEDIES ===== */}
-          {remedies.length > 0 && (
+          {translatedRemedies.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -291,7 +343,7 @@ export default function Report() {
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">{t("report.homeRemediesDesc")}</p>
                 <ul className="space-y-3">
-                  {remedies.map((remedy, idx) => (
+                  {translatedRemedies.map((remedy, idx) => (
                     <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
                       <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/15 text-primary font-bold text-sm flex items-center justify-center">
                         {idx + 1}
@@ -309,8 +361,7 @@ export default function Report() {
             </Card>
           )}
 
-          {/* ===== PRECAUTIONS ===== */}
-          {precautions.length > 0 && (
+          {translatedPrecautions.length > 0 && (
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
@@ -321,7 +372,7 @@ export default function Report() {
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">{t("report.precautionsDesc")}</p>
                 <ul className="space-y-3">
-                  {precautions.map((precaution, idx) => (
+                  {translatedPrecautions.map((precaution, idx) => (
                     <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-warning/5 border border-warning/10">
                       <span className="flex-shrink-0 w-7 h-7 rounded-full bg-warning/15 text-warning font-bold text-sm flex items-center justify-center">
                         {idx + 1}
@@ -334,7 +385,6 @@ export default function Report() {
             </Card>
           )}
 
-          {/* ===== IMAGE ===== */}
           {report.image_url && (
             <Card>
               <CardHeader className="pb-3">
@@ -349,7 +399,6 @@ export default function Report() {
             </Card>
           )}
 
-          {/* ===== DISCLAIMER ===== */}
           <p className="text-xs text-muted-foreground text-center italic px-4 pb-4">
             {t("report.disclaimer")}
           </p>
