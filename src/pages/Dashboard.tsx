@@ -241,7 +241,7 @@ const Dashboard = () => {
             <>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Pending Appointments</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.pendingAppointments")}</CardTitle>
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -253,7 +253,7 @@ const Dashboard = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Confirmed Today</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.confirmedToday")}</CardTitle>
                   <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
@@ -265,26 +265,26 @@ const Dashboard = () => {
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Account</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.account")}</CardTitle>
                   <Activity className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-lg font-bold">Veterinarian</div>
+                  <div className="text-lg font-bold">{t("report.veterinarian")}</div>
                   <p className="text-xs text-muted-foreground">{profile?.email}</p>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Quick Actions</CardTitle>
+                  <CardTitle className="text-sm font-medium">{t("dashboard.quickActions")}</CardTitle>
                   <MessageSquare className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Button size="sm" className="w-full" variant="outline" onClick={() => navigate("/vet-profile")}>
-                    My Clinic
+                    {t("nav.myClinic")}
                   </Button>
                   <Button size="sm" className="w-full" variant="outline" onClick={() => navigate("/messages")}>
-                    Messages
+                    {t("nav.messages")}
                   </Button>
                 </CardContent>
               </Card>
@@ -296,8 +296,8 @@ const Dashboard = () => {
         {userRole === "veterinarian" && appointments.length > 0 && (
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">Upcoming Appointments</h2>
-              <Button variant="outline" onClick={() => navigate("/appointments")}>View All</Button>
+              <h2 className="text-2xl font-bold">{t("dashboard.upcomingAppointments")}</h2>
+              <Button variant="outline" onClick={() => navigate("/appointments")}>{t("dashboard.viewAll")}</Button>
             </div>
             <div className="space-y-3">
               {appointments.map((apt) => (
@@ -326,7 +326,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-warning">
                 <AlertCircle className="h-5 w-5" />
-                Vaccination Reminders
+                {t("dashboard.vaccinationReminders")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -344,7 +344,7 @@ const Dashboard = () => {
                 ))}
               </div>
               <Button variant="outline" className="mt-4" onClick={() => navigate("/vaccinations")}>
-                <Syringe className="mr-2 h-4 w-4" /> Manage Vaccinations
+                <Syringe className="mr-2 h-4 w-4" /> {t("dashboard.manageVaccinations")}
               </Button>
             </CardContent>
           </Card>
@@ -395,8 +395,8 @@ const Dashboard = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-1 text-sm">
-                          {animal.breed && <p><span className="text-muted-foreground">Breed:</span> {animal.breed}</p>}
-                          {animal.age && <p><span className="text-muted-foreground">Age:</span> {animal.age} years</p>}
+                          {animal.breed && <p><span className="text-muted-foreground">{t("report.breed")}:</span> {animal.breed}</p>}
+                          {animal.age && <p><span className="text-muted-foreground">{t("report.age")}:</span> {animal.age} {t("report.years")}</p>}
                         </div>
                         <div className="flex gap-2 mt-4">
                           <Button
@@ -404,7 +404,7 @@ const Dashboard = () => {
                             variant="outline"
                             onClick={() => navigate(`/diagnose?cattle=${animal.id}`)}
                           >
-                            Diagnose
+                            {t("dashboard.diagnoseBtn")}
                           </Button>
                           <Button
                             variant="ghost"
@@ -422,14 +422,14 @@ const Dashboard = () => {
             </TabsContent>
 
             <TabsContent value="reports" className="space-y-4">
-              <h2 className="text-2xl font-bold">Recent Diagnoses</h2>
+              <h2 className="text-2xl font-bold">{t("dashboard.recentDiagnoses")}</h2>
 
               {reports.length === 0 ? (
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-12">
                     <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground mb-4">No diagnosis reports yet</p>
-                    <Button onClick={() => navigate("/diagnose")}>Create First Diagnosis</Button>
+                    <p className="text-muted-foreground mb-4">{t("dashboard.noDiagnoses")}</p>
+                    <Button onClick={() => navigate("/diagnose")}>{t("dashboard.createFirst")}</Button>
                   </CardContent>
                 </Card>
               ) : (
@@ -452,11 +452,11 @@ const Dashboard = () => {
                       <CardContent>
                         <div className="flex items-center justify-between">
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Confidence:</span>{" "}
+                            <span className="text-muted-foreground">{t("dashboard.confidence")}:</span>{" "}
                             <span className="font-medium">{(report.confidence_score * 100).toFixed(1)}%</span>
                           </div>
                           <Button variant="outline" size="sm" onClick={() => navigate(`/report/${report.id}`)}>
-                            View Report
+                            {t("dashboard.viewReport")}
                           </Button>
                         </div>
                       </CardContent>

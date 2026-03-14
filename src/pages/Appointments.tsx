@@ -20,29 +20,16 @@ interface Appointment {
   cattle_id: string | null;
   farmer_id: string;
   vet_id: string;
-  cattle?: {
-    name: string;
-    breed: string;
-  };
-  vet_profile?: {
-    full_name: string;
-    phone?: string;
-    location?: string;
-  };
-  farmer_profile?: {
-    full_name: string;
-    phone: string;
-  };
-  veterinarian?: {
-    clinic_name: string;
-    clinic_address: string;
-    phone: string;
-  };
+  cattle?: { name: string; breed: string };
+  vet_profile?: { full_name: string; phone?: string; location?: string };
+  farmer_profile?: { full_name: string; phone: string };
+  veterinarian?: { clinic_name: string; clinic_address: string; phone: string };
 }
 
 export default function Appointments() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useI18n();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState<string>("");
@@ -54,84 +41,33 @@ export default function Appointments() {
   const fetchUserRoleAndAppointments = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
-      }
+      if (!user) { navigate("/auth"); return; }
 
-      // Get user role
-      const { data: roleData } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .single();
+      const { data: roleData } = await supabase.from("user_roles").select("role").eq("user_id", user.id).single();
+      if (roleData) setUserRole(roleData.role);
 
-      if (roleData) {
-        setUserRole(roleData.role);
-      }
-
-      // Fetch appointments based on role
-      let query = supabase.from("appointments").select(`
-        *,
-        cattle:cattle_id (name, breed)
-      `);
-
-      if (roleData?.role === "farmer") {
-        query = query.eq("farmer_id", user.id);
-      } else if (roleData?.role === "veterinarian") {
-        query = query.eq("vet_id", user.id);
-      }
+      let query = supabase.from("appointments").select(`*, cattle:cattle_id (name, breed)`);
+      if (roleData?.role === "farmer") query = query.eq("farmer_id", user.id);
+      else if (roleData?.role === "veterinarian") query = query.eq("vet_id", user.id);
 
       const { data: appointmentsData, error } = await query.order("appointment_date", { ascending: true });
-
       if (error) throw error;
 
-      // Fetch additional profile information
       const enrichedAppointments = await Promise.all(
         (appointmentsData || []).map(async (apt) => {
           if (roleData?.role === "farmer") {
-            // Fetch vet profile and clinic info
-            const { data: vetProfile } = await supabase
-              .from("profiles")
-              .select("full_name")
-              .eq("id", apt.vet_id)
-              .single();
-
-            const { data: vetClinic } = await supabase
-              .from("veterinarians")
-              .select("clinic_name, clinic_address, phone")
-              .eq("user_id", apt.vet_id)
-              .single();
-
-            return {
-              ...apt,
-              vet_profile: vetProfile,
-              veterinarian: vetClinic,
-            };
+            const { data: vetProfile } = await supabase.from("profiles").select("full_name").eq("id", apt.vet_id).single();
+            const { data: vetClinic } = await supabase.from("veterinarians").select("clinic_name, clinic_address, phone").eq("user_id", apt.vet_id).single();
+            return { ...apt, vet_profile: vetProfile, veterinarian: vetClinic };
           } else {
-            // Fetch farmer profile
-            const { data: farmerProfile } = await supabase
-              .from("profiles")
-              .select("full_name, phone")
-              .eq("id", apt.farmer_id)
-              .single();
-
-            return {
-              ...apt,
-              farmer_profile: farmerProfile,
-            };
+            const { data: farmerProfile } = await supabase.from("profiles").select("full_name, phone").eq("id", apt.farmer_id).single();
+            return { ...apt, farmer_profile: farmerProfile };
           }
         })
       );
-
       setAppointments(enrichedAppointments);
     } catch (error: any) {
-      console.error("Error fetching appointments:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load appointments",
-        variant: "destructive",
-      });
+      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -139,41 +75,32 @@ export default function Appointments() {
 
   const handleStatusUpdate = async (appointmentId: string, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from("appointments")
-        .update({ status: newStatus })
-        .eq("id", appointmentId);
-
+      const { error } = await supabase.from("appointments").update({ status: newStatus }).eq("id", appointmentId);
       if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Appointment status updated",
-      });
-
+      toast({ title: t("common.success"), description: t("apt.subtitle") });
       fetchUserRoleAndAppointments();
     } catch (error: any) {
-      console.error("Error updating appointment:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update appointment",
-        variant: "destructive",
-      });
+      toast({ title: t("common.error"), description: error.message, variant: "destructive" });
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "confirmed":
-        return "bg-success text-white";
-      case "pending":
-        return "bg-warning text-white";
-      case "completed":
-        return "bg-primary text-primary-foreground";
-      case "cancelled":
-        return "bg-destructive text-destructive-foreground";
-      default:
-        return "bg-muted text-muted-foreground";
+      case "confirmed": return "bg-success text-white";
+      case "pending": return "bg-warning text-white";
+      case "completed": return "bg-primary text-primary-foreground";
+      case "cancelled": return "bg-destructive text-destructive-foreground";
+      default: return "bg-muted text-muted-foreground";
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "confirmed": return t("apt.confirmed");
+      case "pending": return t("apt.pending");
+      case "completed": return t("apt.completed");
+      case "cancelled": return t("apt.cancelled");
+      default: return status;
     }
   };
 
@@ -190,34 +117,17 @@ export default function Appointments() {
             <h3 className="text-xl font-bold">
               {userRole === "farmer" ? apt.veterinarian?.clinic_name : apt.farmer_profile?.full_name}
             </h3>
-            <Badge className={getStatusColor(apt.status)}>{apt.status}</Badge>
+            <Badge className={getStatusColor(apt.status)}>{getStatusLabel(apt.status)}</Badge>
           </div>
           <div className="flex gap-2">
             {userRole === "veterinarian" && apt.status === "pending" && (
-              <Button
-                size="sm"
-                onClick={() => handleStatusUpdate(apt.id, "confirmed")}
-              >
-                Confirm
-              </Button>
+              <Button size="sm" onClick={() => handleStatusUpdate(apt.id, "confirmed")}>{t("apt.confirm")}</Button>
             )}
             {apt.status !== "cancelled" && apt.status !== "completed" && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => handleStatusUpdate(apt.id, "cancelled")}
-              >
-                Cancel
-              </Button>
+              <Button size="sm" variant="outline" onClick={() => handleStatusUpdate(apt.id, "cancelled")}>{t("apt.cancelApt")}</Button>
             )}
             {userRole === "veterinarian" && apt.status === "confirmed" && (
-              <Button
-                size="sm"
-                variant="default"
-                onClick={() => handleStatusUpdate(apt.id, "completed")}
-              >
-                Complete
-              </Button>
+              <Button size="sm" variant="default" onClick={() => handleStatusUpdate(apt.id, "completed")}>{t("apt.complete")}</Button>
             )}
           </div>
         </div>
@@ -234,9 +144,7 @@ export default function Appointments() {
           {apt.cattle && (
             <div className="flex items-center gap-2 text-muted-foreground">
               <User className="h-4 w-4" />
-              <span>
-                {apt.cattle.name} ({apt.cattle.breed})
-              </span>
+              <span>{apt.cattle.name} ({apt.cattle.breed})</span>
             </div>
           )}
           {userRole === "farmer" && apt.veterinarian && (
@@ -260,13 +168,13 @@ export default function Appointments() {
         </div>
 
         <div>
-          <p className="text-sm font-semibold mb-1">Reason:</p>
+          <p className="text-sm font-semibold mb-1">{t("apt.reason")}:</p>
           <p className="text-sm text-muted-foreground">{apt.reason}</p>
         </div>
 
         {apt.notes && (
           <div>
-            <p className="text-sm font-semibold mb-1">Notes:</p>
+            <p className="text-sm font-semibold mb-1">{t("apt.notes")}:</p>
             <p className="text-sm text-muted-foreground">{apt.notes}</p>
           </div>
         )}
@@ -288,67 +196,47 @@ export default function Appointments() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-bold text-foreground mb-2">Appointments</h1>
-            <p className="text-muted-foreground">Manage your veterinary appointments</p>
+            <h1 className="text-4xl font-bold text-foreground mb-2">{t("apt.title")}</h1>
+            <p className="text-muted-foreground">{t("apt.subtitle")}</p>
           </div>
           {userRole === "farmer" && (
-            <Button onClick={() => navigate("/appointments/new")}>Book Appointment</Button>
+            <Button onClick={() => navigate("/appointments/new")}>{t("apt.book")}</Button>
           )}
         </div>
 
         <Tabs defaultValue="all" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="all">All ({appointments.length})</TabsTrigger>
-            <TabsTrigger value="pending">
-              Pending ({filterAppointments("pending").length})
-            </TabsTrigger>
-            <TabsTrigger value="confirmed">
-              Confirmed ({filterAppointments("confirmed").length})
-            </TabsTrigger>
-            <TabsTrigger value="completed">
-              Completed ({filterAppointments("completed").length})
-            </TabsTrigger>
+            <TabsTrigger value="all">{t("apt.all")} ({appointments.length})</TabsTrigger>
+            <TabsTrigger value="pending">{t("apt.pending")} ({filterAppointments("pending").length})</TabsTrigger>
+            <TabsTrigger value="confirmed">{t("apt.confirmed")} ({filterAppointments("confirmed").length})</TabsTrigger>
+            <TabsTrigger value="completed">{t("apt.completed")} ({filterAppointments("completed").length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="all" className="space-y-4">
             {appointments.length === 0 ? (
               <Card className="p-8 text-center">
                 <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <p className="text-muted-foreground">No appointments yet</p>
+                <p className="text-muted-foreground">{t("apt.noAppointments")}</p>
               </Card>
-            ) : (
-              appointments.map(renderAppointmentCard)
-            )}
+            ) : appointments.map(renderAppointmentCard)}
           </TabsContent>
 
           <TabsContent value="pending" className="space-y-4">
             {filterAppointments("pending").length === 0 ? (
-              <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No pending appointments</p>
-              </Card>
-            ) : (
-              filterAppointments("pending").map(renderAppointmentCard)
-            )}
+              <Card className="p-8 text-center"><p className="text-muted-foreground">{t("apt.noPending")}</p></Card>
+            ) : filterAppointments("pending").map(renderAppointmentCard)}
           </TabsContent>
 
           <TabsContent value="confirmed" className="space-y-4">
             {filterAppointments("confirmed").length === 0 ? (
-              <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No confirmed appointments</p>
-              </Card>
-            ) : (
-              filterAppointments("confirmed").map(renderAppointmentCard)
-            )}
+              <Card className="p-8 text-center"><p className="text-muted-foreground">{t("apt.noConfirmed")}</p></Card>
+            ) : filterAppointments("confirmed").map(renderAppointmentCard)}
           </TabsContent>
 
           <TabsContent value="completed" className="space-y-4">
             {filterAppointments("completed").length === 0 ? (
-              <Card className="p-8 text-center">
-                <p className="text-muted-foreground">No completed appointments</p>
-              </Card>
-            ) : (
-              filterAppointments("completed").map(renderAppointmentCard)
-            )}
+              <Card className="p-8 text-center"><p className="text-muted-foreground">{t("apt.noCompleted")}</p></Card>
+            ) : filterAppointments("completed").map(renderAppointmentCard)}
           </TabsContent>
         </Tabs>
       </div>
