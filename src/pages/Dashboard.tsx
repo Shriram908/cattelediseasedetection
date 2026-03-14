@@ -428,8 +428,8 @@ const Dashboard = () => {
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-12">
                     <FileText className="h-12 w-12 text-muted-foreground mb-4" />
-                    <p className="text-muted-foreground mb-4">No diagnosis reports yet</p>
-                    <Button onClick={() => navigate("/diagnose")}>Create First Diagnosis</Button>
+                    <p className="text-muted-foreground mb-4">{t("dashboard.noDiagnoses")}</p>
+                    <Button onClick={() => navigate("/diagnose")}>{t("dashboard.createFirst")}</Button>
                   </CardContent>
                 </Card>
               ) : (
