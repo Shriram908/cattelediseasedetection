@@ -5,7 +5,6 @@ import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Loader2, ArrowLeft, Printer, AlertCircle, Stethoscope,
   ShieldAlert, Heart, Clock, Home, ShieldCheck, Bug,
@@ -26,22 +25,11 @@ const SeverityIcon = ({ severity }: { severity: string }) => {
 const SeverityBar = ({ severity }: { severity: string }) => {
   const levels = ["mild", "moderate", "severe", "critical"];
   const activeIndex = levels.indexOf(severity?.toLowerCase());
-  const colors = [
-    "bg-severity-mild",
-    "bg-severity-moderate",
-    "bg-severity-severe",
-    "bg-severity-critical",
-  ];
-
+  const colors = ["bg-severity-mild", "bg-severity-moderate", "bg-severity-severe", "bg-severity-critical"];
   return (
     <div className="flex gap-1.5 mt-2">
       {levels.map((level, i) => (
-        <div
-          key={level}
-          className={`h-2.5 flex-1 rounded-full transition-all ${
-            i <= activeIndex ? colors[i] : "bg-muted"
-          }`}
-        />
+        <div key={level} className={`h-2.5 flex-1 rounded-full transition-all ${i <= activeIndex ? colors[i] : "bg-muted"}`} />
       ))}
     </div>
   );
@@ -73,7 +61,7 @@ export default function Report() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-3">
           <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground">{t("report.loading") || "Loading report..."}</p>
+          <p className="text-muted-foreground">{t("report.loading") || "Loading..."}</p>
         </div>
       </div>
     );
@@ -95,10 +83,10 @@ export default function Report() {
 
   const getSeverityLabel = (severity: string) => {
     switch (severity?.toLowerCase()) {
-      case "mild": return "Mild – Not serious, can be treated at home";
-      case "moderate": return "Moderate – Needs attention, monitor closely";
-      case "severe": return "Severe – Urgent care needed";
-      case "critical": return "Critical – Emergency! See a vet immediately";
+      case "mild": return t("report.severityMild");
+      case "moderate": return t("report.severityModerate");
+      case "severe": return t("report.severitySevere");
+      case "critical": return t("report.severityCritical");
       default: return severity;
     }
   };
@@ -136,7 +124,6 @@ export default function Report() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Screen-only NavBar */}
       <div className="print:hidden"><NavBar /></div>
 
       <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -148,7 +135,7 @@ export default function Report() {
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-foreground">{t("report.title")}</h1>
             <Button onClick={handlePrint} variant="outline" size="sm">
-              <Printer className="mr-2 h-4 w-4" />Print Report
+              <Printer className="mr-2 h-4 w-4" />{t("report.print")}
             </Button>
           </div>
         </div>
@@ -158,11 +145,11 @@ export default function Report() {
           <div className="flex items-center gap-3 mb-2">
             <Stethoscope className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">🐄 CattleCare AI – Health Report</h1>
+              <h1 className="text-2xl font-bold text-foreground">🐄 CattleCare AI – {t("report.printTitle")}</h1>
               <p className="text-sm text-muted-foreground">AI-Powered Cattle Disease Diagnosis</p>
             </div>
           </div>
-          <p className="text-xs text-muted-foreground">Report Date: {diagnosisDate} • Report ID: {report.id?.slice(0, 8)}</p>
+          <p className="text-xs text-muted-foreground">{t("report.generatedOn")}: {diagnosisDate}</p>
         </div>
 
         <div className="space-y-5">
@@ -171,10 +158,8 @@ export default function Report() {
             <div className="rounded-lg border-2 border-severity-critical/40 bg-severity-critical/5 p-4 flex items-start gap-3">
               <ShieldAlert className="h-6 w-6 text-severity-critical flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-bold text-severity-critical text-lg">⚠️ Veterinarian Visit Required</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Based on the symptoms, we strongly recommend consulting a veterinarian as soon as possible. Do not delay treatment.
-                </p>
+                <p className="font-bold text-severity-critical text-lg">{t("report.vetRequired")}</p>
+                <p className="text-sm text-muted-foreground mt-1">{t("report.vetRequiredDesc")}</p>
               </div>
             </div>
           )}
@@ -184,33 +169,33 @@ export default function Report() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Heart className="h-5 w-5 text-primary" />
-                Animal Details
+                {t("report.animalDetails")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-3 gap-x-6 text-sm">
                 <div>
-                  <p className="text-muted-foreground">Name</p>
+                  <p className="text-muted-foreground">{t("report.name")}</p>
                   <p className="font-semibold">{report.cattle?.name || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Breed</p>
+                  <p className="text-muted-foreground">{t("report.breed")}</p>
                   <p className="font-semibold">{report.cattle?.breed || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Tag / ID</p>
+                  <p className="text-muted-foreground">{t("report.tagId")}</p>
                   <p className="font-semibold">{report.cattle?.cattle_tag || "—"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Age</p>
-                  <p className="font-semibold">{report.cattle?.age ? `${report.cattle.age} years` : "—"}</p>
+                  <p className="text-muted-foreground">{t("report.age")}</p>
+                  <p className="font-semibold">{report.cattle?.age ? `${report.cattle.age} ${t("report.years")}` : "—"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Weight</p>
-                  <p className="font-semibold">{report.cattle?.weight ? `${report.cattle.weight} kg` : "—"}</p>
+                  <p className="text-muted-foreground">{t("report.weight")}</p>
+                  <p className="font-semibold">{report.cattle?.weight ? `${report.cattle.weight} ${t("report.kg")}` : "—"}</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Location</p>
+                  <p className="text-muted-foreground">{t("report.location")}</p>
                   <p className="font-semibold">{report.cattle?.farm_location || "—"}</p>
                 </div>
               </div>
@@ -222,22 +207,20 @@ export default function Report() {
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Bug className="h-5 w-5 text-primary" />
-                Diagnosis Result
+                {t("report.diagnosisResult")}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-5">
-              {/* Disease Name */}
               <div className="text-center py-3 rounded-lg bg-primary/5">
-                <p className="text-sm text-muted-foreground mb-1">Detected Disease</p>
+                <p className="text-sm text-muted-foreground mb-1">{t("report.detectedDisease")}</p>
                 <p className="text-3xl font-bold text-primary">{report.predicted_disease}</p>
               </div>
 
-              {/* Severity + Confidence side by side */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="rounded-lg border p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <SeverityIcon severity={report.severity} />
-                    <p className="font-semibold">Severity Level</p>
+                    <p className="font-semibold">{t("report.severityLevel")}</p>
                   </div>
                   <Badge className={`text-sm px-3 py-1 border ${getSeverityColor(report.severity)}`}>
                     {report.severity}
@@ -249,29 +232,25 @@ export default function Report() {
                 <div className="rounded-lg border p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <Activity className="h-5 w-5 text-secondary" />
-                    <p className="font-semibold">AI Confidence</p>
+                    <p className="font-semibold">{t("report.aiConfidence")}</p>
                   </div>
                   <div className="flex items-end gap-1">
                     <span className="text-4xl font-bold text-secondary">{confidencePercent}%</span>
                   </div>
                   <div className="w-full bg-muted rounded-full h-2.5 mt-2">
-                    <div
-                      className="bg-secondary h-2.5 rounded-full transition-all"
-                      style={{ width: `${confidencePercent}%` }}
-                    />
+                    <div className="bg-secondary h-2.5 rounded-full transition-all" style={{ width: `${confidencePercent}%` }} />
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    {confidencePercent >= 80 ? "High confidence in this diagnosis" :
-                     confidencePercent >= 50 ? "Moderate confidence – consult a vet to confirm" :
-                     "Low confidence – please consult a vet"}
+                    {confidencePercent >= 80 ? t("report.confidenceHigh") :
+                     confidencePercent >= 50 ? t("report.confidenceMedium") :
+                     t("report.confidenceLow")}
                   </p>
                 </div>
               </div>
 
-              {/* Observed Symptoms */}
               {report.selected_symptoms && report.selected_symptoms.length > 0 && (
                 <div>
-                  <p className="text-sm font-semibold text-muted-foreground mb-2">Observed Symptoms</p>
+                  <p className="text-sm font-semibold text-muted-foreground mb-2">{t("report.observedSymptoms")}</p>
                   <div className="flex flex-wrap gap-2">
                     {report.selected_symptoms.map((symptom: string) => (
                       <Badge key={symptom} variant="outline" className="capitalize text-xs">
@@ -290,14 +269,12 @@ export default function Report() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Clock className="h-5 w-5 text-accent" />
-                  Expected Recovery Time
+                  {t("report.recoveryTime")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-lg font-semibold">{duration}</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Recovery time may vary. Monitor your animal daily and note any changes.
-                </p>
+                <p className="text-sm text-muted-foreground mt-1">{t("report.recoveryNote")}</p>
               </CardContent>
             </Card>
           )}
@@ -308,23 +285,26 @@ export default function Report() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <Home className="h-5 w-5 text-primary" />
-                  What You Can Do at Home
+                  {t("report.homeRemediesTitle")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">
-                  These are simple steps you can follow right now to help your animal feel better:
-                </p>
+                <p className="text-sm text-muted-foreground mb-4">{t("report.homeRemediesDesc")}</p>
                 <ul className="space-y-3">
                   {remedies.map((remedy, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center">
+                    <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/10">
+                      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-primary/15 text-primary font-bold text-sm flex items-center justify-center">
                         {idx + 1}
                       </span>
                       <span className="text-sm leading-relaxed pt-0.5">{remedy}</span>
                     </li>
                   ))}
                 </ul>
+                <div className="mt-4 p-3 rounded-lg bg-accent/10 border border-accent/20">
+                  <p className="text-xs text-accent-foreground font-medium">
+                    💡 {t("report.importantNote")}
+                  </p>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -335,17 +315,15 @@ export default function Report() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <ShieldCheck className="h-5 w-5 text-warning" />
-                  Precautions to Prevent Spread
+                  {t("report.precautionsTitle")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground mb-3">
-                  Follow these precautions to protect your other animals:
-                </p>
+                <p className="text-sm text-muted-foreground mb-4">{t("report.precautionsDesc")}</p>
                 <ul className="space-y-3">
                   {precautions.map((precaution, idx) => (
-                    <li key={idx} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-warning/10 text-warning font-bold text-sm flex items-center justify-center">
+                    <li key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-warning/5 border border-warning/10">
+                      <span className="flex-shrink-0 w-7 h-7 rounded-full bg-warning/15 text-warning font-bold text-sm flex items-center justify-center">
                         {idx + 1}
                       </span>
                       <span className="text-sm leading-relaxed pt-0.5">{precaution}</span>
@@ -362,43 +340,19 @@ export default function Report() {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-lg">
                   <FileText className="h-5 w-5 text-muted-foreground" />
-                  Uploaded Image
+                  {t("report.uploadedImage")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <img
-                  src={report.image_url}
-                  alt="Cattle diagnosis image"
-                  className="w-full max-h-72 object-cover rounded-lg border"
-                />
+                <img src={report.image_url} alt="Cattle diagnosis" className="w-full max-h-72 object-cover rounded-lg border" />
               </CardContent>
             </Card>
           )}
 
-          {/* ===== FOOTER / META ===== */}
-          <Card className="bg-muted/50">
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground">
-                <div>
-                  <p className="font-medium">Report Date</p>
-                  <p>{diagnosisDate}</p>
-                </div>
-                <div>
-                  <p className="font-medium">AI Model Used</p>
-                  <p>{report.ml_model_used}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="font-medium">Report ID</p>
-                  <p className="font-mono">{report.id}</p>
-                </div>
-              </div>
-              <Separator className="my-4" />
-              <p className="text-xs text-muted-foreground text-center italic">
-                ⚠️ This report is generated by AI and is for informational purposes only.
-                Always consult a qualified veterinarian for proper diagnosis and treatment.
-              </p>
-            </CardContent>
-          </Card>
+          {/* ===== DISCLAIMER ===== */}
+          <p className="text-xs text-muted-foreground text-center italic px-4 pb-4">
+            {t("report.disclaimer")}
+          </p>
         </div>
       </div>
     </div>
