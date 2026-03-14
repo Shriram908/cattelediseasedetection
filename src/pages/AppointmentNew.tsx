@@ -179,7 +179,7 @@ export default function AppointmentNew() {
                   <SelectValue placeholder="Select cattle (optional)" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {cattle.map((animal) => (
                     <SelectItem key={animal.id} value={animal.id}>
                       {animal.name} - {animal.breed}
