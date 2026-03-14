@@ -116,14 +116,15 @@ export default function Report() {
   const { duration, firstAid, remedies, precautions } = parseNotes(report?.treatment_notes ?? null);
 
   // Translate dynamic content
-  const allTexts = [...remedies, ...precautions, duration, report?.predicted_disease || ""].filter(Boolean);
+  const allTexts = [...firstAid, ...remedies, ...precautions, duration, report?.predicted_disease || ""].filter(Boolean);
   const { translated: translatedTexts, isTranslating } = useTranslatedContent(allTexts, language);
 
   // Split translated texts back
-  const translatedRemedies = translatedTexts.slice(0, remedies.length);
-  const translatedPrecautions = translatedTexts.slice(remedies.length, remedies.length + precautions.length);
-  const translatedDuration = translatedTexts[remedies.length + precautions.length] || duration;
-  const translatedDisease = translatedTexts[remedies.length + precautions.length + 1] || report?.predicted_disease || "";
+  const translatedFirstAid = translatedTexts.slice(0, firstAid.length);
+  const translatedRemedies = translatedTexts.slice(firstAid.length, firstAid.length + remedies.length);
+  const translatedPrecautions = translatedTexts.slice(firstAid.length + remedies.length, firstAid.length + remedies.length + precautions.length);
+  const translatedDuration = translatedTexts[firstAid.length + remedies.length + precautions.length] || duration;
+  const translatedDisease = translatedTexts[firstAid.length + remedies.length + precautions.length + 1] || report?.predicted_disease || "";
 
   const handlePrint = () => window.print();
 
