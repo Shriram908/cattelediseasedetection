@@ -395,8 +395,8 @@ const Dashboard = () => {
                       </CardHeader>
                       <CardContent>
                         <div className="space-y-1 text-sm">
-                          {animal.breed && <p><span className="text-muted-foreground">Breed:</span> {animal.breed}</p>}
-                          {animal.age && <p><span className="text-muted-foreground">Age:</span> {animal.age} years</p>}
+                          {animal.breed && <p><span className="text-muted-foreground">{t("report.breed")}:</span> {animal.breed}</p>}
+                          {animal.age && <p><span className="text-muted-foreground">{t("report.age")}:</span> {animal.age} {t("report.years")}</p>}
                         </div>
                         <div className="flex gap-2 mt-4">
                           <Button
