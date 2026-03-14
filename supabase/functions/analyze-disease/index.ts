@@ -148,7 +148,7 @@ Respond ONLY with valid JSON.`;
         ml_model_used: "Lovable AI - Gemini 2.5 Flash",
         severity: diagnosis.severity,
         veterinarian_recommended: diagnosis.veterinarian_required,
-        treatment_notes: `Duration: ${diagnosis.treatment_duration}\n\nHome Remedies:\n${diagnosis.home_remedies.join("\n")}\n\nPrecautions:\n${diagnosis.precautions.join("\n")}`,
+        treatment_notes: `Duration: ${diagnosis.treatment_duration}\n\nFirst Aid:\n${(diagnosis.first_aid || []).join("\n")}\n\nHome Remedies:\n${diagnosis.home_remedies.join("\n")}\n\nPrecautions:\n${diagnosis.precautions.join("\n")}`,
       })
       .select()
       .single();
