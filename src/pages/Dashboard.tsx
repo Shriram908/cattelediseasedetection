@@ -456,7 +456,7 @@ const Dashboard = () => {
                             <span className="font-medium">{(report.confidence_score * 100).toFixed(1)}%</span>
                           </div>
                           <Button variant="outline" size="sm" onClick={() => navigate(`/report/${report.id}`)}>
-                            View Report
+                            {t("dashboard.viewReport")}
                           </Button>
                         </div>
                       </CardContent>
