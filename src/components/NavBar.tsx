@@ -90,36 +90,14 @@ export default function NavBar() {
             >
               <MessageSquare className="h-4 w-4" />
             </Link>
-            {userRole === "farmer" && (
-              <>
-                <Link
-                  to="/appointments"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive("/appointments") ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  <Calendar className="h-4 w-4" />
-                </Link>
-                <Link
-                  to="/vaccinations"
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive("/vaccinations") ? "text-primary" : "text-muted-foreground"
-                  }`}
-                >
-                  <Syringe className="h-4 w-4" />
-                </Link>
-              </>
-            )}
-            {userRole === "veterinarian" && (
-              <Link
-                to="/appointments"
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActive("/appointments") ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                <Calendar className="h-4 w-4" />
-              </Link>
-            )}
+            <Link
+              to="/vaccinations"
+              className={`text-sm font-medium transition-colors hover:text-primary ${
+                isActive("/vaccinations") ? "text-primary" : "text-muted-foreground"
+              }`}
+            >
+              <Syringe className="h-4 w-4" />
+            </Link>
             <Link
               to="/profile"
               className={`text-sm font-medium transition-colors hover:text-primary ${
