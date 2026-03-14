@@ -55,3 +55,6 @@ verify_jwt = false
 
 [functions.analyze-disease]
 verify_jwt = true
+
+[functions.cattle-chat]
+verify_jwt = false

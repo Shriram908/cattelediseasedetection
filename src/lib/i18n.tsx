@@ -213,13 +213,13 @@ const translations: Record<Language, Record<string, string>> = {
     "apt.complete": "Complete",
     "apt.cancelApt": "Cancel",
 
-    // Messages
-    "msg.title": "Messages",
-    "msg.subtitle": "Chat with veterinarians and farmers",
+    // Messages / AI Chat
+    "msg.title": "CattleCare AI Assistant",
+    "msg.subtitle": "Ask me anything about cattle health, diseases, and care",
     "msg.conversations": "Conversations",
     "msg.noConversations": "No conversations yet",
     "msg.selectConversation": "Select a conversation to start messaging",
-    "msg.typeMessage": "Type a message...",
+    "msg.typeMessage": "Ask about cattle health, diseases, remedies...",
 
     // Common
     "common.loading": "Loading...",
@@ -459,13 +459,13 @@ const translations: Record<Language, Record<string, string>> = {
     "apt.complete": "पूर्ण करें",
     "apt.cancelApt": "रद्द करें",
 
-    // Messages
-    "msg.title": "संदेश",
-    "msg.subtitle": "पशु चिकित्सकों और किसानों से चैट करें",
+    // Messages / AI Chat
+    "msg.title": "CattleCare AI सहायक",
+    "msg.subtitle": "पशु स्वास्थ्य, बीमारियों और देखभाल के बारे में कुछ भी पूछें",
     "msg.conversations": "वार्तालाप",
     "msg.noConversations": "अभी तक कोई वार्तालाप नहीं",
     "msg.selectConversation": "संदेश शुरू करने के लिए एक वार्तालाप चुनें",
-    "msg.typeMessage": "संदेश टाइप करें...",
+    "msg.typeMessage": "पशु स्वास्थ्य, बीमारियों, उपचार के बारे में पूछें...",
 
     // Common
     "common.loading": "लोड हो रहा है...",
@@ -705,13 +705,13 @@ const translations: Record<Language, Record<string, string>> = {
     "apt.complete": "पूर्ण करा",
     "apt.cancelApt": "रद्द करा",
 
-    // Messages
-    "msg.title": "संदेश",
-    "msg.subtitle": "पशुवैद्य आणि शेतकऱ्यांशी चॅट करा",
+    // Messages / AI Chat
+    "msg.title": "CattleCare AI सहाय्यक",
+    "msg.subtitle": "पशु आरोग्य, रोग आणि काळजी बद्दल काहीही विचारा",
     "msg.conversations": "संवाद",
     "msg.noConversations": "अद्याप संवाद नाहीत",
     "msg.selectConversation": "संदेश पाठवण्यासाठी संवाद निवडा",
-    "msg.typeMessage": "संदेश टाइप करा...",
+    "msg.typeMessage": "पशु आरोग्य, रोग, उपचारांबद्दल विचारा...",
 
     // Common
     "common.loading": "लोड होत आहे...",
