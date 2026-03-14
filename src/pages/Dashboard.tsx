@@ -452,7 +452,7 @@ const Dashboard = () => {
                       <CardContent>
                         <div className="flex items-center justify-between">
                           <div className="text-sm">
-                            <span className="text-muted-foreground">Confidence:</span>{" "}
+                            <span className="text-muted-foreground">{t("dashboard.confidence")}:</span>{" "}
                             <span className="font-medium">{(report.confidence_score * 100).toFixed(1)}%</span>
                           </div>
                           <Button variant="outline" size="sm" onClick={() => navigate(`/report/${report.id}`)}>
