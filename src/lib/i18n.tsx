@@ -459,13 +459,13 @@ const translations: Record<Language, Record<string, string>> = {
     "apt.complete": "पूर्ण करें",
     "apt.cancelApt": "रद्द करें",
 
-    // Messages
-    "msg.title": "संदेश",
-    "msg.subtitle": "पशु चिकित्सकों और किसानों से चैट करें",
+    // Messages / AI Chat
+    "msg.title": "CattleCare AI सहायक",
+    "msg.subtitle": "पशु स्वास्थ्य, बीमारियों और देखभाल के बारे में कुछ भी पूछें",
     "msg.conversations": "वार्तालाप",
     "msg.noConversations": "अभी तक कोई वार्तालाप नहीं",
     "msg.selectConversation": "संदेश शुरू करने के लिए एक वार्तालाप चुनें",
-    "msg.typeMessage": "संदेश टाइप करें...",
+    "msg.typeMessage": "पशु स्वास्थ्य, बीमारियों, उपचार के बारे में पूछें...",
 
     // Common
     "common.loading": "लोड हो रहा है...",
