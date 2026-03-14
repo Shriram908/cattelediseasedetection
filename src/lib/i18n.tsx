@@ -460,6 +460,8 @@ const translations: Record<Language, Record<string, string>> = {
     "report.years": "वर्ष",
     "report.kg": "किग्रा",
     "report.importantNote": "महत्वपूर्ण: यदि लक्षण बिगड़ते हैं या नए लक्षण दिखते हैं, तो तुरंत पशु चिकित्सक से संपर्क करें।",
+    "report.firstAidTitle": "⚡ तत्काल प्राथमिक उपचार",
+    "report.firstAidDesc": "पशु चिकित्सक के आने से पहले अभी ये कदम उठाएं। तुरंत कार्रवाई आपके पशु की जान बचा सकती है।",
 
     // Profile
     "profile.title": "मेरी प्रोफ़ाइल",
