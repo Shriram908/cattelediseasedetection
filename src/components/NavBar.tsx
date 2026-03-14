@@ -138,21 +138,9 @@ export default function NavBar() {
               <Link to="/messages" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                 {t("nav.messages")}
               </Link>
-              {userRole === "farmer" && (
-                <>
-                  <Link to="/appointments" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.appointments")}
-                  </Link>
-                  <Link to="/vaccinations" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                    {t("nav.vaccinations")}
-                  </Link>
-                </>
-              )}
-              {userRole === "veterinarian" && (
-                <Link to="/appointments" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
-                  {t("nav.appointments")}
-                </Link>
-              )}
+              <Link to="/vaccinations" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
+                {t("nav.vaccinations")}
+              </Link>
               <Link to="/profile" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                 {t("nav.profile")}
               </Link>
