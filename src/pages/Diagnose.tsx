@@ -168,7 +168,7 @@ export default function Diagnose() {
               {COMMON_SYMPTOMS.map((symptom) => (
                 <div key={symptom} className="flex items-center space-x-2">
                   <Checkbox id={symptom} checked={selectedSymptoms.includes(symptom)} onCheckedChange={() => handleSymptomToggle(symptom)} />
-                  <Label htmlFor={symptom} className="text-sm font-medium leading-none capitalize cursor-pointer">{symptom.replace(/_/g, " ")}</Label>
+                  <Label htmlFor={symptom} className="text-sm font-medium leading-none cursor-pointer">{t(`symptom.${symptom}`)}</Label>
                 </div>
               ))}
             </div>
