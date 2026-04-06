@@ -34,18 +34,87 @@ serve(async (req) => {
     console.log("Symptoms:", symptoms);
     console.log("Image URL:", imageUrl);
 
+    // ===== RAG STEP 1: RETRIEVAL =====
+    // Query the diseases knowledge base to find matching diseases based on symptoms
+    let retrievedDiseases: any[] = [];
+    
+    if (symptoms && symptoms.length > 0) {
+      // Retrieve diseases where any symptom overlaps with user-selected symptoms
+      const { data: matchedDiseases, error: dbError } = await supabase
+        .from("diseases")
+        .select("*");
+
+      if (dbError) {
+        console.error("Error fetching diseases:", dbError);
+      } else if (matchedDiseases) {
+        // Score each disease by counting symptom overlaps
+        const scored = matchedDiseases.map((disease: any) => {
+          const overlapCount = disease.symptoms.filter((s: string) =>
+            symptoms.includes(s)
+          ).length;
+          const overlapRatio = overlapCount / disease.symptoms.length;
+          return { ...disease, overlapCount, overlapRatio };
+        });
+
+        // Sort by overlap count descending and take top 5
+        retrievedDiseases = scored
+          .filter((d: any) => d.overlapCount > 0)
+          .sort((a: any, b: any) => b.overlapCount - a.overlapCount)
+          .slice(0, 5);
+
+        console.log(
+          "RAG Retrieved diseases:",
+          retrievedDiseases.map((d: any) => `${d.name} (${d.overlapCount} matches)`)
+        );
+      }
+    } else {
+      // No symptoms provided - retrieve all diseases as general context
+      const { data: allDiseases } = await supabase
+        .from("diseases")
+        .select("*");
+      if (allDiseases) {
+        retrievedDiseases = allDiseases.slice(0, 5);
+      }
+    }
+
+    // ===== RAG STEP 2: AUGMENTATION =====
+    // Build context from retrieved diseases
+    let ragContext = "";
+    if (retrievedDiseases.length > 0) {
+      ragContext = `\n\n--- RETRIEVED KNOWLEDGE BASE (from local disease database) ---\nThe following diseases from our curated veterinary database matched the input symptoms. Use this as grounded reference data for your diagnosis:\n\n`;
+      
+      retrievedDiseases.forEach((disease: any, index: number) => {
+        ragContext += `${index + 1}. ${disease.name}
+   - Severity: ${disease.severity}
+   - Urgency: ${disease.urgency || "N/A"}
+   - Known Symptoms: ${disease.symptoms.map((s: string) => s.replace(/_/g, " ")).join(", ")}
+   - Description: ${disease.description}
+   - Treatment Duration: ${disease.treatment_duration || "N/A"}
+   - Veterinarian Recommended: ${disease.veterinarian_recommended ? "Yes" : "No"}
+   - Home Remedies: ${disease.home_remedies.join("; ")}
+   - Precautions: ${disease.precautions.join("; ")}
+   - Symptom Match Score: ${disease.overlapCount || 0} overlapping symptoms (${Math.round((disease.overlapRatio || 0) * 100)}% match)
+\n`;
+      });
+
+      ragContext += `--- END KNOWLEDGE BASE ---\n\nIMPORTANT: Prioritize diseases from the knowledge base when they strongly match the symptoms. Use the database information for treatment details, remedies and precautions. You may still diagnose a disease NOT in the database if the image or symptoms clearly indicate it.`;
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Build the analysis prompt
+    // ===== RAG STEP 3: GENERATION =====
     let analysisPrompt = `You are an expert veterinary AI specializing in cattle diseases. Analyze the following and provide an accurate diagnosis.`;
 
     if (symptoms && symptoms.length > 0) {
       analysisPrompt += `\n\nObserved symptoms:\n${symptoms.map((s: string, i: number) => `${i + 1}. ${s.replace(/_/g, " ")}`).join("\n")}`;
     }
 
+    // Inject RAG context
+    analysisPrompt += ragContext;
+
     if (imageUrl) {
-      analysisPrompt += `\n\nIMPORTANT: An image of the affected cattle has been provided. You MUST carefully examine this image to identify visual signs of disease such as skin lesions, lumps, swelling, discharge, posture abnormalities, coat condition, etc. The visual analysis should be the PRIMARY basis for your diagnosis when an image is provided. Do NOT ignore the image.`;
+      analysisPrompt += `\n\nIMPORTANT: An image of the affected cattle has been provided. You MUST carefully examine this image to identify visual signs of disease such as skin lesions, lumps, swelling, discharge, posture abnormalities, coat condition, etc. The visual analysis should be the PRIMARY basis for your diagnosis when an image is provided. Cross-reference visual findings with the retrieved knowledge base above.`;
     }
 
     analysisPrompt += `\n\nProvide your diagnosis as a JSON object with these fields:
@@ -59,15 +128,15 @@ serve(async (req) => {
   "description": "string (2-3 sentences explaining the disease in simple language)",
   "first_aid": ["step1", "step2", "step3"],
   "home_remedies": ["remedy1", "remedy2", "remedy3"],
-  "precautions": ["precaution1", "precaution2", "precaution3"]
+  "precautions": ["precaution1", "precaution2", "precaution3"],
+  "rag_matched": boolean (true if your diagnosis matches a disease from the knowledge base above),
+  "knowledge_source": "string (either 'database' if matched from knowledge base, or 'model' if from general knowledge)"
 }
 
-For "first_aid", provide 3-5 immediate emergency steps a farmer should take RIGHT NOW before a vet arrives. These should be simple, actionable steps like isolating the animal, providing clean water, keeping the animal calm, etc.
+For "first_aid", provide 3-5 immediate emergency steps a farmer should take RIGHT NOW before a vet arrives.
 
-Consider: Lumpy Skin Disease, Mastitis, Foot-and-Mouth Disease, Foot Rot, Bloat, Pneumonia, Blackleg, Coccidiosis, Bovine Dermatophilosis, Ringworm, Bovine Papillomatosis, Rumen Acidosis, and others.
 Respond ONLY with valid JSON.`;
 
-    // Build messages array - use multimodal content when image is provided
     const userContent: any[] = [{ type: "text", text: analysisPrompt }];
 
     if (imageUrl) {
@@ -88,7 +157,7 @@ Respond ONLY with valid JSON.`;
         messages: [
           {
             role: "system",
-            content: "You are a veterinary AI expert specializing in cattle disease diagnosis from both symptoms and images. When an image is provided, analyze it carefully for visual disease indicators. Always respond with valid JSON only.",
+            content: "You are a veterinary AI expert using Retrieval-Augmented Generation (RAG). You have access to a curated disease knowledge base. When diseases from the knowledge base match the symptoms, use that grounded data for accurate diagnosis. Always respond with valid JSON only.",
           },
           {
             role: "user",
@@ -136,6 +205,11 @@ Respond ONLY with valid JSON.`;
       throw new Error("Incomplete diagnosis from AI");
     }
 
+    // Build ML model description including RAG info
+    const mlModelUsed = diagnosis.rag_matched
+      ? "RAG Pipeline (Gemini 2.5 Flash + Disease Knowledge Base)"
+      : "Lovable AI - Gemini 2.5 Flash (Zero-shot)";
+
     const { data: report, error: reportError } = await supabase
       .from("reports")
       .insert({
@@ -145,10 +219,10 @@ Respond ONLY with valid JSON.`;
         selected_symptoms: symptoms || [],
         predicted_disease: diagnosis.disease_name,
         confidence_score: diagnosis.confidence_score,
-        ml_model_used: "Lovable AI - Gemini 2.5 Flash",
+        ml_model_used: mlModelUsed,
         severity: diagnosis.severity,
         veterinarian_recommended: diagnosis.veterinarian_required,
-        treatment_notes: `Duration: ${diagnosis.treatment_duration}\n\nFirst Aid:\n${(diagnosis.first_aid || []).join("\n")}\n\nHome Remedies:\n${diagnosis.home_remedies.join("\n")}\n\nPrecautions:\n${diagnosis.precautions.join("\n")}`,
+        treatment_notes: `Knowledge Source: ${diagnosis.knowledge_source || "model"}\nDuration: ${diagnosis.treatment_duration}\n\nFirst Aid:\n${(diagnosis.first_aid || []).join("\n")}\n\nHome Remedies:\n${diagnosis.home_remedies.join("\n")}\n\nPrecautions:\n${diagnosis.precautions.join("\n")}`,
       })
       .select()
       .single();
@@ -158,7 +232,7 @@ Respond ONLY with valid JSON.`;
       throw reportError;
     }
 
-    console.log("Report saved:", report.id);
+    console.log("Report saved:", report.id, "| RAG matched:", diagnosis.rag_matched, "| Source:", diagnosis.knowledge_source);
 
     return new Response(
       JSON.stringify({
