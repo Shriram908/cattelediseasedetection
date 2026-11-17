@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Stethoscope, LogOut, Menu, X, User, MessageSquare, Syringe } from "lucide-react";
+import { Stethoscope, LogOut, Menu, X, User, MessageSquare, Syringe, ShieldCheck } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/lib/i18n";
+import { useIsAdmin } from "@/components/RequireAdmin";
 
 export default function NavBar() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function NavBar() {
   const { t } = useI18n();
   const [user, setUser] = useState<any>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { data: isAdmin } = useIsAdmin();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -85,6 +87,13 @@ export default function NavBar() {
             >
               <User className="h-4 w-4" />
             </Link>
+            {isAdmin && (
+              <Link aria-label="Admin" title="Admin" to="/admin"
+                className={`text-sm font-medium transition-colors hover:text-primary ${isActive("/admin") ? "text-primary" : "text-muted-foreground"}`}
+              >
+                <ShieldCheck className="h-4 w-4" />
+              </Link>
+            )}
             <LanguageSwitcher />
             <Button variant="ghost" size="sm" onClick={handleLogout}>
               <LogOut className="h-4 w-4 mr-2" />
@@ -123,6 +132,9 @@ export default function NavBar() {
             <Link to="/profile" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
               {t("nav.profile")}
             </Link>
+            {isAdmin && (
+              <Link to="/admin" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>Admin</Link>
+            )}
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
             </div>
