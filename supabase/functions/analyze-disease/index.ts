@@ -162,7 +162,7 @@ Respond ONLY with valid JSON.`;
     for (const key of ["first_aid", "home_remedies", "precautions"]) {
       if (!Array.isArray(diagnosis[key]) || diagnosis[key].length > 10 || diagnosis[key].some((item: unknown) => typeof item !== "string" || item.length > 3000)) throw new Error("Invalid advice from AI");
     }
-    diagnosis.rag_matched = retrievedDiseases.some(d => d.name.toLowerCase() === diagnosis.disease_name.toLowerCase());
+    diagnosis.rag_matched = retrievedDiseases.some((d: { name: string }) => d.name.toLowerCase() === diagnosis.disease_name.toLowerCase());
     diagnosis.knowledge_source = diagnosis.rag_matched ? "database" : "model";
     if (["Severe", "Critical"].includes(diagnosis.severity)) diagnosis.veterinarian_required = true;
 
