@@ -13,3 +13,4 @@
 - [x] Keep code clean and modular (ongoing standard).
 
 - [x] Razorpay ₹99 pay-per-diagnosis step on Report page (test mode)
+- [x] Replace Lovable favicon with CattleCare icon (ships to Vercel via GitHub sync + redeploy)
