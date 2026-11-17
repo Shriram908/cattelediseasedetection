@@ -1,16 +1,16 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { authenticate, readBody, corsHeaders, RequestError, errorResponse } from "../_shared/security.ts";
+import { validTranslation } from "../_shared/validation.ts";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { texts, targetLanguage } = await req.json();
-    if (!texts || !targetLanguage || targetLanguage === "en") {
+    await authenticate(req);
+    const { texts, targetLanguage } = await readBody(req);
+    if (!validTranslation(texts, targetLanguage)) throw new RequestError("Invalid translation input");
+    if (targetLanguage === "en" || texts.length === 0) {
       return new Response(JSON.stringify({ translated: texts }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -27,6 +27,7 @@ serve(async (req) => {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
+      signal: AbortSignal.timeout(45_000),
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-lite",
         messages: [
@@ -56,14 +57,12 @@ serve(async (req) => {
     const content = data.choices?.[0]?.message?.content || "[]";
     const cleaned = content.replace(/```json\n?|\n?```/g, "").trim();
     const translated = JSON.parse(cleaned);
+    if (!Array.isArray(translated) || translated.length !== texts.length || translated.some(t => typeof t !== "string")) throw new Error("Invalid translation output");
 
     return new Response(JSON.stringify({ translated }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("translate error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return errorResponse(e);
   }
 });
