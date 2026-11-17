@@ -8,6 +8,13 @@
       "when": 1794891454973,
       "tag": "0000_deployment_access_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794892202001,
+      "tag": "0001_retire_vet_write_access",
+      "breakpoints": true
     }
   ]
 }
