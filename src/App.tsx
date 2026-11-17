@@ -15,6 +15,8 @@ import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import Vaccinations from "./pages/Vaccinations";
 import NotFound from "./pages/NotFound";
+import RequireAdmin from "./components/RequireAdmin";
+import Admin from "./pages/Admin";
 import RequireAuth from "./components/RequireAuth";
 import AppErrorBoundary from "./components/AppErrorBoundary";
 
@@ -39,6 +41,9 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/vaccinations" element={<Vaccinations />} />
+            <Route element={<RequireAdmin />}>
+              <Route path="/admin" element={<Admin />} />
+            </Route>
             </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

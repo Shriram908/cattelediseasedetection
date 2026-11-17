@@ -5,3 +5,5 @@
 - Assign signup roles exclusively through the protected server trigger; never trust client role metadata.
 - Validate cattle image types and sizes consistently across upload screens; hosted image URLs remain publicly shareable by existing design.
 - Run focused security regression tests with the package test command before reporting readiness.
+- Gate admin screens with the server is_admin check (RequireAdmin) and rely on row policies for data; never trust client role state.
+- Phone OTP is passwordless sign-in/sign-up; the signup trigger copies the verified phone into profiles.

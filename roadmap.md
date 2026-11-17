@@ -5,7 +5,9 @@
 - [x] Protect signed-in pages, clear account caches, fix launch copy and mobile usability.
 - [x] Verify authenticated diagnosis/chat and saved records; document remaining launch checks in DEPLOYMENT_READINESS.md.
 - [x] Review deep security findings and resolve identified issues.
-- [ ] Extend farmer contacts and add report-by-email (sender domain required).
-- [ ] Add restricted admin diagnosis, signup and chatbot analytics.
-- [ ] Index disease references with full-dimension embeddings and switch diagnosis retrieval to semantic search.
+- [ ] Report-by-email button (blocked: needs a sender email domain).
+- [x] Add restricted admin diagnosis, signup and chatbot analytics.
+- [x] Index disease references with full-dimension embeddings and switch diagnosis retrieval to semantic search.
 - [ ] Verify authorization, semantic retrieval and the new screens.
+- [x] Mobile number OTP login/signup alongside email (needs SMS provider turned on in Phone settings).
+- [x] Keep code clean and modular (ongoing standard).
