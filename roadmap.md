@@ -11,3 +11,5 @@
 - [ ] Verify authorization, semantic retrieval and the new screens.
 - [x] Mobile number OTP login/signup alongside email (needs SMS provider turned on in Phone settings).
 - [x] Keep code clean and modular (ongoing standard).
+
+- [ ] Razorpay pay-per-diagnosis step on Report page (blocked: waiting for Razorpay test keys from user)
