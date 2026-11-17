@@ -74,7 +74,7 @@ const Auth = () => {
         return;
       }
       const { error } = await supabase.auth.signUp({
-        email: signupEmail,
+        email,
         password: signupPassword,
         options: {
           data: { full_name: fullName, role },
@@ -121,7 +121,7 @@ const Auth = () => {
           </TabsContent>
 
           <TabsContent value="email">
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs value={emailTab} onValueChange={(v) => setEmailTab(v as "login" | "signup")} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="login">{t("auth.login")}</TabsTrigger>
             <TabsTrigger value="signup">{t("auth.signup")}</TabsTrigger>
