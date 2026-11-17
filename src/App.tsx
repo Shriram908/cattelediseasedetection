@@ -19,6 +19,7 @@ import RequireAdmin from "./components/RequireAdmin";
 import Admin from "./pages/Admin";
 import RequireAuth from "./components/RequireAuth";
 import AppErrorBoundary from "./components/AppErrorBoundary";
+import PageMetadata from "./components/PageMetadata";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <PageMetadata />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
