@@ -1,0 +1,8 @@
+REVOKE INSERT, UPDATE, DELETE ON public.veterinarians, public.vet_notes, public.appointments, public.conversations, public.messages FROM anon, authenticated;
+COMMENT ON TABLE public.veterinarians IS 'DEPRECATED: veterinarian-facing workflows are retired; client writes disabled.';
+COMMENT ON TABLE public.appointments IS 'DEPRECATED: booking workflows are retired; client writes disabled.';
+CREATE OR REPLACE FUNCTION public.get_user_role(_user_id uuid) RETURNS public.app_role LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$ SELECT role FROM public.user_roles WHERE user_id = _user_id AND _user_id = auth.uid() LIMIT 1 $$;
+CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role public.app_role) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$ SELECT EXISTS (SELECT 1 FROM public.user_roles WHERE user_id = _user_id AND role = _role AND _user_id = auth.uid()) $$;
+CREATE OR REPLACE FUNCTION public.vet_has_notes_on_report(_vet_id uuid, _report_id uuid) RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$ SELECT EXISTS (SELECT 1 FROM public.vet_notes WHERE vet_id = _vet_id AND report_id = _report_id AND _vet_id = auth.uid()) $$;
+REVOKE EXECUTE ON FUNCTION public.get_user_role(uuid), public.has_role(uuid, public.app_role), public.vet_has_notes_on_report(uuid, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_user_role(uuid), public.has_role(uuid, public.app_role), public.vet_has_notes_on_report(uuid, uuid) TO authenticated, service_role;

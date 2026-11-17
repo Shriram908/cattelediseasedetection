@@ -53,23 +53,20 @@ function useTranslatedContent(texts: string[], language: string) {
     }
 
     setIsTranslating(true);
-    fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/translate-content`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-      },
-      body: JSON.stringify({ texts, targetLanguage: language }),
-    })
-      .then(r => r.json())
-      .then(data => {
-        if (data.translated && Array.isArray(data.translated)) {
+    let active = true;
+    setTranslated(texts);
+    supabase.functions.invoke("translate-content", { body: { texts, targetLanguage: language } })
+      .then(({ data, error }) => {
+        if (!active) return;
+        if (error) throw error;
+        if (Array.isArray(data?.translated) && data.translated.length === texts.length) {
           setTranslated(data.translated);
           sessionStorage.setItem(cacheKey, JSON.stringify(data.translated));
         }
       })
-      .catch(() => setTranslated(texts))
-      .finally(() => setIsTranslating(false));
+      .catch(() => { if (active) setTranslated(texts); })
+      .finally(() => { if (active) setIsTranslating(false); });
+    return () => { active = false; };
   }, [cacheKey, language, texts.length]);
 
   return { translated, isTranslating };
@@ -83,10 +80,11 @@ export default function Report() {
   const { data: report, isLoading } = useQuery({
     queryKey: ["report", reportId],
     queryFn: async () => {
+      if (!reportId) throw new Error("Report not found");
       const { data, error } = await supabase
         .from("reports")
         .select(`*, cattle:cattle_id (name, breed, cattle_tag, age, weight, farm_location)`)
-        .eq("id", reportId!)
+        .eq("id", reportId)
         .single();
       if (error) throw error;
       return data;
@@ -188,7 +186,7 @@ export default function Report() {
           <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" />{t("report.backDashboard")}
           </Button>
-          <div className="flex justify-between items-center">
+          <div className="flex flex-wrap gap-3 justify-between items-center">
             <h1 className="text-3xl font-bold text-foreground">{t("report.title")}</h1>
             <Button onClick={handlePrint} variant="outline" size="sm">
               <Printer className="mr-2 h-4 w-4" />{t("report.print")}

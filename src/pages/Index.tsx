@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Activity, Brain, FileText, MapPin, Shield, Zap } from "lucide-react";
+import { Activity, Brain, FileText, Syringe, Shield, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { useI18n } from "@/lib/i18n";
+import cattlePhoto from "@/assets/cow_lumpy_skin_disease.jpg";
 const Index = () => {
   const navigate = useNavigate();
   const { t } = useI18n();
@@ -12,7 +13,7 @@ const Index = () => {
     {
       icon: Brain,
       title: "AI-Powered Detection",
-      description: "Advanced machine learning algorithms analyze images and symptoms to detect 26+ cattle diseases with high accuracy.",
+      description: "AI analyzes cattle photos and symptoms using a reference library of 15 diseases. Results are preliminary assessments, not confirmed diagnoses.",
     },
     {
       icon: FileText,
@@ -22,12 +23,12 @@ const Index = () => {
     {
       icon: Zap,
       title: "Dual Analysis",
-      description: "Combine image-based CNN analysis with symptom-based classification for more accurate diagnoses.",
+      description: "Combine image observations and selected symptoms with retrieved disease information.",
     },
     {
-      icon: MapPin,
-      title: "Veterinarian Locator",
-      description: "Find nearby veterinarians with contact details when professional care is recommended.",
+      icon: Syringe,
+      title: "Vaccination Records",
+      description: "Track vaccination history and see reminders for upcoming and overdue doses.",
     },
     {
       icon: Shield,
@@ -50,7 +51,7 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-primary/5 via-background to-secondary/5 py-20 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]"></div>
+        <img src={cattlePhoto} alt="Cattle with visible skin symptoms" className="absolute inset-0 w-full h-full object-cover opacity-10" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
@@ -72,23 +73,23 @@ const Index = () => {
                 {t("landing.getStarted")}
                 <Activity className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" onClick={() => navigate("/auth")}>
+              <Button size="lg" variant="outline" onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}>
                 {t("landing.learnMore")}
               </Button>
             </div>
 
             <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">26+</div>
+                <div className="text-3xl font-bold text-primary">15</div>
                 <div className="text-sm text-muted-foreground">{t("landing.diseases")}</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">92+</div>
+                <div className="text-3xl font-bold text-primary">15</div>
                 <div className="text-sm text-muted-foreground">{t("landing.symptoms")}</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl font-bold text-primary">95%+</div>
-                <div className="text-sm text-muted-foreground">{t("landing.accuracy")}</div>
+                <div className="text-3xl font-bold text-primary">3</div>
+                <div className="text-sm text-muted-foreground">{t("landing.languages")}</div>
               </div>
             </div>
           </div>
@@ -96,7 +97,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-background">
+      <section id="features" className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">{t("landing.features")}</h2>
@@ -142,12 +143,12 @@ const Index = () => {
                 {
                   step: "2",
                   title: "AI Analysis",
-                  description: "Our advanced ML models analyze the data using CNN for images and multiple algorithms for symptoms",
+                  description: "The AI compares your observations with disease information retrieved from the reference library",
                 },
                 {
                   step: "3",
                   title: "Get Results",
-                  description: "Receive detailed diagnosis with confidence scores, treatment recommendations, and veterinarian referrals if needed",
+                  description: "Review a preliminary assessment, safe first-aid guidance, and advice on when to contact a veterinarian",
                 },
               ].map((item) => (
                 <div key={item.step} className="flex gap-6 items-start">

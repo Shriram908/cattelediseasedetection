@@ -99,7 +99,7 @@ export default function CattleEdit() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="age">{t("cattle.age")}</Label>
-                <Input id="age" name="age" type="number" min="0" step="0.1" value={formData.age} onChange={handleChange} placeholder="e.g., 3" />
+                <Input id="age" name="age" type="number" min="0" step="1" value={formData.age} onChange={handleChange} placeholder="e.g., 3" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="weight">{t("cattle.weight")}</Label>

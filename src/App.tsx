@@ -15,11 +15,13 @@ import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import Vaccinations from "./pages/Vaccinations";
 import NotFound from "./pages/NotFound";
+import RequireAuth from "./components/RequireAuth";
+import AppErrorBoundary from "./components/AppErrorBoundary";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <AppErrorBoundary><QueryClientProvider client={queryClient}>
     <I18nProvider>
       <TooltipProvider>
         <Toaster />
@@ -28,6 +30,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route element={<RequireAuth />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/diagnose" element={<Diagnose />} />
             <Route path="/cattle/new" element={<CattleNew />} />
@@ -36,13 +39,14 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/vaccinations" element={<Vaccinations />} />
+            </Route>
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </I18nProvider>
-  </QueryClientProvider>
+  </QueryClientProvider></AppErrorBoundary>
 );
 
 export default App;

@@ -1,0 +1,7 @@
+# Architecture rules
+- Keep private pages under RequireAuth and clear query caches on account changes to prevent stale cross-account data.
+- All AI functions authenticate in code, validate bounded inputs, and use the caller-scoped data client so row policies enforce ownership.
+- Keep reusable edge-function request handling and pure validators in _shared so deployed imports remain self-contained.
+- Assign signup roles exclusively through the protected server trigger; never trust client role metadata.
+- Validate cattle image types and sizes consistently across upload screens; hosted image URLs remain publicly shareable by existing design.
+- Run focused security regression tests with the package test command before reporting readiness.

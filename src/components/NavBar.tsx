@@ -44,7 +44,7 @@ export default function NavBar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden lg:flex items-center space-x-6">
             <Link
               to="/dashboard"
               className={`text-sm font-medium transition-colors hover:text-primary ${
@@ -61,7 +61,7 @@ export default function NavBar() {
             >
               {t("nav.diagnose")}
             </Link>
-            <Link
+            <Link aria-label={t("nav.messages")} title={t("nav.messages")}
               to="/messages"
               className={`text-sm font-medium transition-colors hover:text-primary ${
                 isActive("/messages") ? "text-primary" : "text-muted-foreground"
@@ -69,7 +69,7 @@ export default function NavBar() {
             >
               <MessageSquare className="h-4 w-4" />
             </Link>
-            <Link
+            <Link aria-label={t("nav.vaccinations")} title={t("nav.vaccinations")}
               to="/vaccinations"
               className={`text-sm font-medium transition-colors hover:text-primary ${
                 isActive("/vaccinations") ? "text-primary" : "text-muted-foreground"
@@ -77,7 +77,7 @@ export default function NavBar() {
             >
               <Syringe className="h-4 w-4" />
             </Link>
-            <Link
+            <Link aria-label={t("nav.profile")} title={t("nav.profile")}
               to="/profile"
               className={`text-sm font-medium transition-colors hover:text-primary ${
                 isActive("/profile") ? "text-primary" : "text-muted-foreground"
@@ -93,8 +93,8 @@ export default function NavBar() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden"
+          <Button variant="ghost" size="icon" aria-label="Menu" aria-expanded={mobileMenuOpen}
+            className="lg:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -102,12 +102,12 @@ export default function NavBar() {
             ) : (
               <Menu className="h-6 w-6" />
             )}
-          </button>
+          </Button>
         </div>
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 space-y-3 border-t">
+          <div className="lg:hidden py-4 space-y-3 border-t">
             <Link to="/dashboard" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
               {t("nav.dashboard")}
             </Link>

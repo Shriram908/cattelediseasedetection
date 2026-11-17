@@ -335,12 +335,14 @@ const translations: Record<Language, Record<string, string>> = {
     "landing.diseases": "Diseases Detected",
     "landing.symptoms": "Symptoms Analyzed",
     "landing.accuracy": "Accuracy Rate",
+    "landing.languages": "Languages",
+    "msg.send": "Send",
     "landing.features": "Comprehensive Features",
     "landing.featuresSub": "Everything you need to monitor and maintain the health of your cattle herd",
     "landing.howItWorks": "How It Works",
     "landing.howItWorksSub": "Simple, fast, and accurate diagnosis in 3 easy steps",
     "landing.cta": "Ready to Protect Your Herd?",
-    "landing.ctaSub": "Join thousands of farmers and veterinarians using CattleCare AI for accurate disease detection",
+    "landing.ctaSub": "Keep cattle health records, review AI assessments, and track vaccinations in one place",
     "landing.startTrial": "Start Free Trial",
   },
 
@@ -676,12 +678,14 @@ const translations: Record<Language, Record<string, string>> = {
     "landing.diseases": "रोग पहचाने गए",
     "landing.symptoms": "लक्षण विश्लेषित",
     "landing.accuracy": "सटीकता दर",
+    "landing.languages": "भाषाएँ",
+    "msg.send": "भेजें",
     "landing.features": "व्यापक सुविधाएँ",
     "landing.featuresSub": "अपने पशुधन के स्वास्थ्य की निगरानी और रखरखाव के लिए आवश्यक सब कुछ",
     "landing.howItWorks": "यह कैसे काम करता है",
     "landing.howItWorksSub": "3 आसान चरणों में सरल, तेज़ और सटीक निदान",
     "landing.cta": "अपने पशुधन की रक्षा के लिए तैयार हैं?",
-    "landing.ctaSub": "सटीक रोग पहचान के लिए CattleCare AI का उपयोग करने वाले हजारों किसानों और पशु चिकित्सकों से जुड़ें",
+    "landing.ctaSub": "पशु स्वास्थ्य रिकॉर्ड, AI आकलन और टीकाकरण एक जगह प्रबंधित करें",
     "landing.startTrial": "मुफ्त शुरू करें",
   },
 
@@ -1017,12 +1021,14 @@ const translations: Record<Language, Record<string, string>> = {
     "landing.diseases": "रोग ओळखले",
     "landing.symptoms": "लक्षणे विश्लेषित",
     "landing.accuracy": "अचूकता दर",
+    "landing.languages": "भाषा",
+    "msg.send": "पाठवा",
     "landing.features": "सर्वसमावेशक वैशिष्ट्ये",
     "landing.featuresSub": "तुमच्या पशुधनाच्या आरोग्याचे निरीक्षण आणि देखभाल करण्यासाठी आवश्यक सर्वकाही",
     "landing.howItWorks": "हे कसे कार्य करते",
     "landing.howItWorksSub": "3 सोप्या चरणांमध्ये सोपे, जलद आणि अचूक निदान",
     "landing.cta": "तुमच्या पशुधनाचे रक्षण करण्यास तयार आहात?",
-    "landing.ctaSub": "अचूक रोग शोधासाठी CattleCare AI वापरणाऱ्या हजारो शेतकऱ्यांमध्ये आणि पशुवैद्यांमध्ये सामील व्हा",
+    "landing.ctaSub": "पशु आरोग्य नोंदी, AI मूल्यांकन आणि लसीकरण एकाच ठिकाणी व्यवस्थापित करा",
     "landing.startTrial": "मोफत सुरू करा",
   },
 };
@@ -1050,7 +1056,7 @@ const I18nContext = createContext<I18nContextType>({
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>(() => {
     const saved = localStorage.getItem("cattlecare-lang");
-    return (saved as Language) || "en";
+    return saved === "hi" || saved === "mr" ? saved : "en";
   });
 
   const handleSetLanguage = (lang: Language) => {
