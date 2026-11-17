@@ -1,3 +1,4 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 
 import { authenticate, readBody, corsHeaders, RequestError, errorResponse } from "../_shared/security.ts";
@@ -7,9 +8,14 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    await authenticate(req);
+    const { user } = await authenticate(req);
     const { messages, language = "en" } = await readBody(req);
     if (!validChatMessages(messages) || !["en", "hi", "mr"].includes(language)) throw new RequestError("Invalid chat input");
+    const latest = [...messages].reverse().find((m: any) => m.role === "user");
+    if (!latest) throw new RequestError("A farmer question is required");
+    const writer = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+    const { error: auditError } = await writer.from("chatbot_queries").insert({ user_id: user.id, query: latest.content, language });
+    if (auditError) throw new RequestError("Unable to record the chatbot question", 503);
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
