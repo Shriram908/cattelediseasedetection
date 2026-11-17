@@ -57,6 +57,13 @@
       "when": 1794896871124,
       "tag": "0007_restrict_disease_embeddings_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1794899260873,
+      "tag": "0008_pay_per_diagnosis",
+      "breakpoints": true
     }
   ]
 }

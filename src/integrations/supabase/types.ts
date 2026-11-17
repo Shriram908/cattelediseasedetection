@@ -170,6 +170,53 @@ export type Database = {
           },
         ]
       }
+      diagnosis_payments: {
+        Row: {
+          amount_paise: number
+          created_at: string
+          currency: string
+          id: string
+          paid_at: string | null
+          razorpay_order_id: string
+          razorpay_payment_id: string | null
+          report_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount_paise: number
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          razorpay_order_id: string
+          razorpay_payment_id?: string | null
+          report_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount_paise?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          razorpay_order_id?: string
+          razorpay_payment_id?: string | null
+          report_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "diagnosis_payments_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       disease_embeddings: {
         Row: {
           content: string
@@ -322,6 +369,7 @@ export type Database = {
           selected_symptoms: string[] | null
           severity: string
           treatment_notes: string | null
+          unlocked: boolean
           user_id: string
           veterinarian_recommended: boolean
         }
@@ -337,6 +385,7 @@ export type Database = {
           selected_symptoms?: string[] | null
           severity: string
           treatment_notes?: string | null
+          unlocked?: boolean
           user_id: string
           veterinarian_recommended: boolean
         }
@@ -352,6 +401,7 @@ export type Database = {
           selected_symptoms?: string[] | null
           severity?: string
           treatment_notes?: string | null
+          unlocked?: boolean
           user_id?: string
           veterinarian_recommended?: boolean
         }
@@ -578,6 +628,14 @@ export type Database = {
         Returns: {
           disease_id: string
           similarity: number
+        }[]
+      }
+      my_locked_reports: {
+        Args: { _report_id?: string }
+        Returns: {
+          cattle_name: string
+          diagnosis_date: string
+          id: string
         }[]
       }
       vet_has_notes_on_report: {
