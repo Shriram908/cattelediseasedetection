@@ -6,7 +6,10 @@ import { DIAGNOSIS_CURRENCY, DIAGNOSIS_PRICE_PAISE, validPaymentSignature, valid
 const keyId = (Deno.env.get("RAZORPAY_KEY_ID") ?? "").trim();
 const keySecret = (Deno.env.get("RAZORPAY_KEY_SECRET") ?? "").trim();
 
-async function createOrder(admin: ReturnType<typeof createClient>, userId: string, reportId: unknown) {
+// deno-lint-ignore no-explicit-any
+type AdminClient = any;
+
+async function createOrder(admin: AdminClient, userId: string, reportId: unknown) {
   if (!validUuid(reportId)) throw new RequestError("Invalid report");
   const { data: report, error } = await admin.from("reports").select("id, unlocked").eq("id", reportId).eq("user_id", userId).maybeSingle();
   if (error) throw error;
@@ -31,7 +34,7 @@ async function createOrder(admin: ReturnType<typeof createClient>, userId: strin
   return { unlocked: false, order_id: order.id, amount: DIAGNOSIS_PRICE_PAISE, currency: DIAGNOSIS_CURRENCY, key_id: keyId };
 }
 
-async function verifyPayment(admin: ReturnType<typeof createClient>, userId: string, body: Record<string, unknown>) {
+async function verifyPayment(admin: AdminClient, userId: string, body: Record<string, unknown>) {
   const { order_id: orderId, payment_id: paymentId, signature } = body;
   if (!validRazorpayId(orderId) || !validRazorpayId(paymentId)) throw new RequestError("Invalid payment details");
   const { data: payment, error } = await admin.from("diagnosis_payments").select("id, report_id, status").eq("razorpay_order_id", orderId).eq("user_id", userId).maybeSingle();
