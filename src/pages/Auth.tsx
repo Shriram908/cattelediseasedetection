@@ -26,6 +26,7 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [emailTab, setEmailTab] = useState<"login" | "signup">("login");
   const role = "farmer";
 
   useEffect(() => {
@@ -63,6 +64,15 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      const email = signupEmail.trim().toLowerCase();
+      const { data: alreadyRegistered, error: checkError } = await supabase.rpc("email_registered", { _email: email });
+      if (checkError) throw checkError;
+      if (alreadyRegistered) {
+        setLoginEmail(email);
+        setEmailTab("login");
+        toast({ variant: "destructive", title: t("auth.emailTaken"), description: t("auth.emailTakenDesc") });
+        return;
+      }
       const { error } = await supabase.auth.signUp({
         email: signupEmail,
         password: signupPassword,
