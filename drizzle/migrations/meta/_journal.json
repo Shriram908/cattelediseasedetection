@@ -22,6 +22,20 @@
       "when": 1794892306088,
       "tag": "0002_restrict_cattle_file_listing",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1794894003301,
+      "tag": "0003_semantic_diseases_admin_audit",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794894035514,
+      "tag": "0004_admin_metrics_contact_validation",
+      "breakpoints": true
     }
   ]
 }

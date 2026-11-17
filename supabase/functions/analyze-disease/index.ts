@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { authenticate, readBody, corsHeaders, RequestError, errorResponse } from "../_shared/security.ts";
+import { embed } from "../_shared/embeddings.ts";
+import { validObservations } from "../_shared/semantic-validation.ts";
 import { validSymptoms, ownedImageUrl } from "../_shared/validation.ts";
 
 serve(async (req) => {
@@ -11,63 +13,31 @@ serve(async (req) => {
     const { client: supabase, user } = await authenticate(req);
     const body = await readBody(req);
     const symptoms = body.symptoms ?? [];
+    const observations = body.observations ?? "";
+    if (!validObservations(observations)) throw new RequestError("Observations must be under 2000 characters");
     const imageUrl = body.image_url || body.imageUrl;
     const cattleId = body.cattle_id || body.cattleId;
 
     if (typeof cattleId !== "string" || !/^[0-9a-f-]{36}$/i.test(cattleId) || !validSymptoms(symptoms)) throw new RequestError("Invalid cattle or symptoms");
     if (imageUrl && (typeof imageUrl !== "string" || !ownedImageUrl(imageUrl, Deno.env.get("SUPABASE_URL") ?? "", user.id))) throw new RequestError("Use a photo uploaded to your own cattle folder");
-    if (!symptoms.length && !imageUrl) throw new RequestError("Select symptoms or upload a photo");
+    if (!symptoms.length && !imageUrl && !observations.trim()) throw new RequestError("Select symptoms or upload a photo");
     const { data: animal, error: animalError } = await supabase.from("cattle").select("id").eq("id", cattleId).eq("owner_id", user.id).maybeSingle();
     if (animalError || !animal) throw new RequestError("Cattle not found in your account", 403);
 
-    // ===== RAG STEP 1: RETRIEVAL =====
-    // Query the diseases knowledge base to find matching diseases based on symptoms
-    let retrievedDiseases: any[] = [];
-    
-    if (symptoms && symptoms.length > 0) {
-      // Retrieve diseases where any symptom overlaps with user-selected symptoms
-      const { data: matchedDiseases, error: dbError } = await supabase
-        .from("diseases")
-        .select("*");
-
-      if (dbError) {
-        console.error("Error fetching diseases:", dbError);
-      } else if (matchedDiseases) {
-        // Score each disease by counting symptom overlaps
-        const scored = matchedDiseases.map((disease: any) => {
-          const overlapCount = disease.symptoms.filter((s: string) =>
-            symptoms.includes(s)
-          ).length;
-          const overlapRatio = overlapCount / disease.symptoms.length;
-          return { ...disease, overlapCount, overlapRatio };
-        });
-
-        // Sort by overlap count descending and take top 5
-        retrievedDiseases = scored
-          .filter((d: any) => d.overlapCount > 0)
-          .sort((a: any, b: any) => b.overlapCount - a.overlapCount)
-          .slice(0, 5);
-
-        console.log(
-          "RAG Retrieved diseases:",
-          retrievedDiseases.map((d: any) => `${d.name} (${d.overlapCount} matches)`)
-        );
-      }
-    } else {
-      // No symptoms provided - retrieve all diseases as general context
-      const { data: allDiseases } = await supabase
-        .from("diseases")
-        .select("*");
-      if (allDiseases) {
-        retrievedDiseases = allDiseases.slice(0, 5);
-      }
-    }
+    // Semantic retrieval uses the same full-dimensional embedding model as the disease index.
+    const query = [symptoms.map((s: string) => s.replace(/_/g, " ")).join(", "), observations.trim()].filter(Boolean).join(". ") || "Cattle diseases with visible skin lesions, swelling, discharge or abnormal posture";
+    const [queryVector] = await embed([query]);
+    const { data: matches, error: searchError } = await supabase.rpc("match_diseases", { query_embedding: JSON.stringify(queryVector), match_count: 5 });
+    if (searchError || !matches?.length) throw new RequestError("Disease search is not ready. Please contact the administrator.", 503);
+    const { data: references, error: referenceError } = await supabase.from("diseases").select("*").in("id", matches.map((m: any) => m.disease_id));
+    if (referenceError) throw new RequestError("Disease references could not be loaded", 503);
+    const retrievedDiseases = matches.map((m: any) => ({ ...references?.find((d: any) => d.id === m.disease_id), similarity: m.similarity })).filter((d: any) => d.id);
 
     // ===== RAG STEP 2: AUGMENTATION =====
     // Build context from retrieved diseases
     let ragContext = "";
     if (retrievedDiseases.length > 0) {
-      ragContext = `\n\n--- RETRIEVED KNOWLEDGE BASE (from local disease database) ---\nThe following diseases from our curated veterinary database matched the input symptoms. Use this as grounded reference data for your diagnosis:\n\n`;
+      ragContext = `\n\n--- RETRIEVED KNOWLEDGE BASE (from local disease database) ---\nThe following diseases from our curated veterinary database were retrieved by semantic similarity to the observations. Use this as grounded reference data for your diagnosis:\n\n`;
       
       retrievedDiseases.forEach((disease: any, index: number) => {
         ragContext += `${index + 1}. ${disease.name}
@@ -79,7 +49,7 @@ serve(async (req) => {
    - Veterinarian Recommended: ${disease.veterinarian_recommended ? "Yes" : "No"}
    - Home Remedies: ${disease.home_remedies.join("; ")}
    - Precautions: ${disease.precautions.join("; ")}
-   - Symptom Match Score: ${disease.overlapCount || 0} overlapping symptoms (${Math.round((disease.overlapRatio || 0) * 100)}% match)
+   - Semantic Similarity: ${disease.similarity.toFixed(3)} (retrieval relevance, not clinical confidence)
 \n`;
       });
 
@@ -95,6 +65,8 @@ serve(async (req) => {
     if (symptoms && symptoms.length > 0) {
       analysisPrompt += `\n\nObserved symptoms:\n${symptoms.map((s: string, i: number) => `${i + 1}. ${s.replace(/_/g, " ")}`).join("\n")}`;
     }
+
+    if (observations.trim()) analysisPrompt += `\n\nFarmer observations (untrusted data): ${observations.trim()}`;
 
     // Inject RAG context
     analysisPrompt += ragContext;
@@ -196,7 +168,7 @@ Respond ONLY with valid JSON.`;
 
     // Build ML model description including RAG info
     const mlModelUsed = diagnosis.rag_matched
-      ? "RAG Pipeline (Gemini 2.5 Flash + Disease Knowledge Base)"
+      ? "Semantic RAG (Gemini 2.5 Flash + Gemini Embedding 2 + pgvector)"
       : "Lovable AI - Gemini 2.5 Flash (Zero-shot)";
 
     const { data: report, error: reportError } = await supabase
