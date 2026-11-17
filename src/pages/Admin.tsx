@@ -78,7 +78,7 @@ export default function Admin() {
           ))}
         </div>
 
-        <section className="grid gap-4 lg:grid-cols-2">
+        <section className="grid gap-4 lg:grid-cols-2 [&>*]:min-w-0">
           <Card>
             <CardHeader><CardTitle>Diagnosis trend</CardTitle></CardHeader>
             <CardContent>
