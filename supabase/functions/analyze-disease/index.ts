@@ -171,9 +171,12 @@ Respond ONLY with valid JSON.`;
       ? "Semantic RAG (Gemini 2.5 Flash + Gemini Embedding 2 + pgvector)"
       : "Lovable AI - Gemini 2.5 Flash (Zero-shot)";
 
-    const { data: report, error: reportError } = await supabase
+    // New reports start locked until paid, so the farmer cannot read the row back; assign the id here.
+    const reportId = crypto.randomUUID();
+    const { error: reportError } = await supabase
       .from("reports")
       .insert({
+        id: reportId,
         cattle_id: cattleId,
         user_id: user.id,
         image_url: imageUrl || null,
@@ -184,22 +187,17 @@ Respond ONLY with valid JSON.`;
         severity: diagnosis.severity,
         veterinarian_recommended: diagnosis.veterinarian_required,
         treatment_notes: `Knowledge Source: ${diagnosis.knowledge_source || "model"}\nDuration: ${diagnosis.treatment_duration}\n\nFirst Aid:\n${(diagnosis.first_aid || []).join("\n")}\n\nHome Remedies:\n${diagnosis.home_remedies.join("\n")}\n\nPrecautions:\n${diagnosis.precautions.join("\n")}`,
-      })
-      .select()
-      .single();
+      });
 
     if (reportError) {
       console.error("Error saving report:", reportError);
       throw reportError;
     }
 
-    console.log("Report saved:", report.id, "| RAG matched:", diagnosis.rag_matched, "| Source:", diagnosis.knowledge_source);
+    console.log("Report saved:", reportId, "| RAG matched:", diagnosis.rag_matched, "| Source:", diagnosis.knowledge_source);
 
     return new Response(
-      JSON.stringify({
-        report_id: report.id,
-        diagnosis: { ...diagnosis, report_id: report.id },
-      }),
+      JSON.stringify({ report_id: reportId }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

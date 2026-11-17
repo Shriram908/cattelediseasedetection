@@ -61,3 +61,5 @@ verify_jwt = false
 
 [functions.translate-content]
 verify_jwt = false
+[functions.razorpay-payment]
+verify_jwt = false

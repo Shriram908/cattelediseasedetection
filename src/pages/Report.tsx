@@ -1,7 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import NavBar from "@/components/NavBar";
+import PayToUnlock from "@/components/PayToUnlock";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +77,7 @@ export default function Report() {
   const { reportId } = useParams<{ reportId: string }>();
   const navigate = useNavigate();
   const { t, language } = useI18n();
+  const queryClient = useQueryClient();
 
   const { data: report, isLoading } = useQuery({
     queryKey: ["report", reportId],
@@ -85,12 +87,28 @@ export default function Report() {
         .from("reports")
         .select(`*, cattle:cattle_id (name, breed, cattle_tag, age, weight, farm_location)`)
         .eq("id", reportId)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
     enabled: !!reportId,
   });
+
+  // Unpaid reports are hidden by the database; fetch only their summary for the payment step.
+  const { data: lockedReport, isLoading: lockedLoading } = useQuery({
+    queryKey: ["locked-report", reportId],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("my_locked_reports", { _report_id: reportId });
+      if (error) throw error;
+      return data?.[0] ?? null;
+    },
+    enabled: !!reportId && !isLoading && !report,
+  });
+
+  const handleUnlocked = () => {
+    queryClient.invalidateQueries({ queryKey: ["report", reportId] });
+    queryClient.invalidateQueries({ queryKey: ["locked-report", reportId] });
+  };
 
   const parseNotes = (notes: string | null) => {
     if (!notes) return { duration: "", firstAid: [] as string[], remedies: [] as string[], precautions: [] as string[] };
@@ -126,12 +144,31 @@ export default function Report() {
 
   const handlePrint = () => window.print();
 
-  if (isLoading) {
+  if (isLoading || (!report && lockedLoading)) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center space-y-3">
           <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto" />
           <p className="text-muted-foreground">{t("common.loading")}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!report && lockedReport) {
+    return (
+      <div className="min-h-screen bg-background">
+        <NavBar />
+        <div className="container mx-auto px-4 py-8 max-w-2xl">
+          <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-4">
+            <ArrowLeft className="mr-2 h-4 w-4" />{t("report.backDashboard")}
+          </Button>
+          <PayToUnlock
+            reportId={lockedReport.id}
+            cattleName={lockedReport.cattle_name}
+            diagnosisDate={lockedReport.diagnosis_date}
+            onUnlocked={handleUnlocked}
+          />
         </div>
       </div>
     );

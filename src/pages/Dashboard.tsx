@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Activity, Plus, FileText, Heart, Settings, Syringe, AlertCircle } from "lucide-react";
+import { Activity, Plus, FileText, Heart, Settings, Syringe, AlertCircle, Lock } from "lucide-react";
 import { User } from "@supabase/supabase-js";
 import { format, addDays } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -38,6 +38,12 @@ interface Report {
   };
 }
 
+interface LockedReport {
+  id: string;
+  diagnosis_date: string;
+  cattle_name: string | null;
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -46,6 +52,7 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [cattle, setCattle] = useState<Cattle[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
+  const [lockedReports, setLockedReports] = useState<LockedReport[]>([]);
   const [dueVaccinations, setDueVaccinations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -100,6 +107,9 @@ const Dashboard = () => {
         .order("diagnosis_date", { ascending: false })
         .limit(10);
       setReports(reportsData || []);
+
+      const { data: lockedData } = await supabase.rpc("my_locked_reports");
+      setLockedReports(lockedData || []);
 
       // Fetch due vaccinations
       const { data: vacData } = await supabase
@@ -290,7 +300,24 @@ const Dashboard = () => {
           <TabsContent value="reports" className="space-y-4">
             <h2 className="text-2xl font-bold">{t("dashboard.recentDiagnoses")}</h2>
 
-            {reports.length === 0 ? (
+            {lockedReports.map((locked) => (
+              <Card key={locked.id} className="border-primary/30">
+                <CardContent className="flex flex-wrap items-center justify-between gap-3 py-4">
+                  <div className="flex items-center gap-3">
+                    <Lock className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="font-medium">{t("payment.awaiting")}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {locked.cattle_name ?? "—"} • {new Date(locked.diagnosis_date).toLocaleDateString()}
+                      </p>
+                    </div>
+                  </div>
+                  <Button size="sm" onClick={() => navigate(`/report/${locked.id}`)}>{t("payment.unlock")}</Button>
+                </CardContent>
+              </Card>
+            ))}
+
+            {reports.length === 0 && lockedReports.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <FileText className="h-12 w-12 text-muted-foreground mb-4" />
