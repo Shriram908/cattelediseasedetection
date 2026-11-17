@@ -50,6 +50,13 @@
       "when": 1794896663351,
       "tag": "0006_prevent_duplicate_signup",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794896871124,
+      "tag": "0007_restrict_disease_embeddings_reads",
+      "breakpoints": true
     }
   ]
 }
