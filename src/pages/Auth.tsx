@@ -26,6 +26,7 @@ const Auth = () => {
   const [signupEmail, setSignupEmail] = useState("");
   const [signupPassword, setSignupPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [emailTab, setEmailTab] = useState<"login" | "signup">("login");
   const role = "farmer";
 
   useEffect(() => {
@@ -63,8 +64,17 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      const email = signupEmail.trim().toLowerCase();
+      const { data: alreadyRegistered, error: checkError } = await supabase.rpc("email_registered", { _email: email });
+      if (checkError) throw checkError;
+      if (alreadyRegistered) {
+        setLoginEmail(email);
+        setEmailTab("login");
+        toast({ variant: "destructive", title: t("auth.emailTaken"), description: t("auth.emailTakenDesc") });
+        return;
+      }
       const { error } = await supabase.auth.signUp({
-        email: signupEmail,
+        email,
         password: signupPassword,
         options: {
           data: { full_name: fullName, role },
@@ -111,7 +121,7 @@ const Auth = () => {
           </TabsContent>
 
           <TabsContent value="email">
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs value={emailTab} onValueChange={(v) => setEmailTab(v as "login" | "signup")} className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="login">{t("auth.login")}</TabsTrigger>
             <TabsTrigger value="signup">{t("auth.signup")}</TabsTrigger>
