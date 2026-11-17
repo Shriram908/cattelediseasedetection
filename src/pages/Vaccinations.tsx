@@ -84,7 +84,7 @@ export default function Vaccinations() {
     <div className="min-h-screen bg-background">
       <NavBar />
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 flex justify-between items-center">
+        <div className="mb-8 flex flex-wrap gap-4 justify-between items-center">
           <div>
             <h1 className="text-4xl font-bold text-foreground mb-2">{t("vac.title")}</h1>
             <p className="text-muted-foreground">{t("vac.subtitle")}</p>
@@ -93,7 +93,7 @@ export default function Vaccinations() {
             <DialogTrigger asChild>
               <Button><Plus className="mr-2 h-4 w-4" />{t("vac.add")}</Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[90dvh] overflow-y-auto">
               <DialogHeader><DialogTitle>{t("vac.addRecord")}</DialogTitle></DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
@@ -171,7 +171,7 @@ export default function Vaccinations() {
                       <div className="flex items-center gap-2">
                         {isDueOrOverdue(vac.next_due_date) && <AlertCircle className="h-4 w-4 text-warning" />}
                         <span className="text-muted-foreground">{t("vac.nextDueLabel")}:</span>
-                        <Badge className={isDueOrOverdue(vac.next_due_date) ? "bg-warning text-white" : "bg-success text-white"}>
+                        <Badge className={isDueOrOverdue(vac.next_due_date) ? "bg-warning text-foreground" : "bg-success text-primary-foreground"}>
                           {format(new Date(vac.next_due_date), "PPP")}
                         </Badge>
                       </div>

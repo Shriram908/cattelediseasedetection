@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Send, Bot, User } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import ReactMarkdown from "react-markdown";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -41,16 +42,18 @@ export default function Messages() {
   ];
 
   const streamChat = async (allMessages: ChatMessage[]) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Please sign in to continue");
     const resp = await fetch(CHAT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        Authorization: `Bearer ${session.access_token}`,
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
       },
       body: JSON.stringify({
-        messages: allMessages,
+        messages: allMessages.slice(-30),
         language,
-        systemPrompt: LANG_SYSTEM_PROMPTS[language] || LANG_SYSTEM_PROMPTS.en,
       }),
     });
 
@@ -141,13 +144,13 @@ export default function Messages() {
                   <p className="text-muted-foreground mb-6">{t("msg.startConversation")}</p>
                   <div className="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto">
                     {quickQuestions.map((q, i) => (
-                      <button
+                      <Button variant="outline"
                         key={i}
                         onClick={() => handleSend(q)}
-                        className="text-sm px-3 py-2 rounded-full border border-primary/30 text-primary hover:bg-primary/10 transition-colors text-left"
+                        className="h-auto whitespace-normal text-sm px-3 py-2 border-primary/30 text-primary text-left"
                       >
                         {q}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -166,7 +169,7 @@ export default function Messages() {
                       : "bg-muted"
                   }`}>
                     {msg.role === "assistant" ? (
-                      <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2">
+                      <div className="prose prose-sm dark:prose-invert max-w-none break-words [&>p]:mb-2 [&>ul]:mb-2 [&>ol]:mb-2">
                         <ReactMarkdown>{msg.content}</ReactMarkdown>
                       </div>
                     ) : (
@@ -201,9 +204,10 @@ export default function Messages() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t("msg.typeMessage")}
                 disabled={isLoading}
+                maxLength={4000}
                 className="rounded-full"
               />
-              <Button type="submit" disabled={isLoading || !input.trim()} size="icon" className="rounded-full shrink-0">
+              <Button type="submit" aria-label={t("msg.send")} title={t("msg.send")} disabled={isLoading || !input.trim()} size="icon" className="rounded-full shrink-0">
                 {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </Button>
             </div>

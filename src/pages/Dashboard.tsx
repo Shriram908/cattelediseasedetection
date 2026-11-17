@@ -225,7 +225,7 @@ const Dashboard = () => {
           </TabsList>
 
           <TabsContent value="cattle" className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap gap-3 items-center justify-between">
               <h2 className="text-2xl font-bold">{t("dashboard.cattleRegistry")}</h2>
               <Button onClick={() => navigate("/cattle/new")} className="gap-2">
                 <Plus className="h-4 w-4" />
@@ -316,7 +316,7 @@ const Dashboard = () => {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-wrap gap-3 items-center justify-between">
                         <div className="text-sm">
                           <span className="text-muted-foreground">{t("dashboard.confidence")}:</span>{" "}
                           <span className="font-medium">{(report.confidence_score * 100).toFixed(1)}%</span>

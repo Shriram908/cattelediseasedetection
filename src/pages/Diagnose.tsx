@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { imageValidationError } from "@/lib/upload-validation";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import NavBar from "@/components/NavBar";
 import { Button } from "@/components/ui/button";
@@ -22,7 +24,8 @@ export default function Diagnose() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useI18n();
-  const [selectedCattle, setSelectedCattle] = useState<string>("");
+  const [searchParams] = useSearchParams();
+  const [selectedCattle, setSelectedCattle] = useState<string>(searchParams.get("cattle") || "");
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -42,6 +45,8 @@ export default function Diagnose() {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const error = imageValidationError(file);
+      if (error) { toast({ title: t("common.error"), description: error, variant: "destructive" }); e.target.value = ""; return; }
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => setImagePreview(reader.result as string);
@@ -90,10 +95,14 @@ export default function Diagnose() {
         body: { cattle_id: selectedCattle, symptoms: selectedSymptoms.length > 0 ? selectedSymptoms : undefined, image_url: uploadedImageUrl || undefined },
       });
       if (error) throw error;
+      if (!data?.report_id) throw new Error(t("diagnose.analysisFailed"));
       toast({ title: t("common.success"), description: t("diagnose.analysisComplete") });
       navigate(`/report/${data.report_id}`);
     } catch (error: any) {
-      console.error("Analysis error:", error);
+      if (error instanceof FunctionsHttpError) {
+        const details = await error.context.json().catch(() => ({}));
+        error = new Error(details.error || t("diagnose.analysisFailed"));
+      }
       toast({ title: t("common.error"), description: error.message || t("diagnose.analysisFailed"), variant: "destructive" });
     } finally {
       setIsAnalyzing(false);
@@ -133,11 +142,11 @@ export default function Diagnose() {
             <h2 className="text-xl font-semibold mb-4">{t("diagnose.selectCattle")}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {cattle.map((c) => (
-                <button key={c.id} onClick={() => setSelectedCattle(c.id)}
-                  className={`p-4 border-2 rounded-lg text-left transition-all ${selectedCattle === c.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
+                <Button variant="outline" aria-pressed={selectedCattle === c.id} key={c.id} onClick={() => setSelectedCattle(c.id)}
+                  className={`h-auto block whitespace-normal p-4 border-2 rounded-lg text-left transition-all ${selectedCattle === c.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"}`}>
                   <div className="font-semibold">{c.name}</div>
                   <div className="text-sm text-muted-foreground">{c.breed} • Tag: {c.cattle_tag || t("common.na")}</div>
-                </button>
+                </Button>
               ))}
             </div>
           </Card>
@@ -145,7 +154,7 @@ export default function Diagnose() {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">{t("diagnose.uploadImage")}</h2>
             <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-primary/50 transition-colors">
-              <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" id="image-upload" />
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={handleImageChange} className="hidden" id="image-upload" />
               <label htmlFor="image-upload" className="cursor-pointer">
                 {imagePreview ? (
                   <div className="space-y-4">

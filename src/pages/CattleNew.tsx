@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import NavBar from "@/components/NavBar";
+import { imageValidationError } from "@/lib/upload-validation";
 
 export default function CattleNew() {
   const navigate = useNavigate();
@@ -31,6 +32,8 @@ export default function CattleNew() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      const error = imageValidationError(file);
+      if (error) { toast({ title: "Invalid photo", description: error, variant: "destructive" }); e.target.value = ""; return; }
       setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -76,12 +79,12 @@ export default function CattleNew() {
         const url = await uploadImage(imageFile, user.id);
         if (url) {
           uploadedImageUrl = url;
-        }
+        } else throw new Error("Photo upload failed. Please try again.");
       }
 
       const { error } = await supabase.from("cattle").insert({
         owner_id: user.id,
-        name: formData.name,
+        name: formData.name.trim(),
         breed: formData.breed || null,
         cattle_tag: formData.cattle_tag || null,
         age: formData.age ? parseInt(formData.age) : null,
@@ -165,7 +168,7 @@ export default function CattleNew() {
                   name="age"
                   type="number"
                   min="0"
-                  step="0.1"
+                  step="1"
                   value={formData.age}
                   onChange={handleChange}
                   placeholder="e.g., 3"
@@ -203,7 +206,7 @@ export default function CattleNew() {
               <Input
                 id="image"
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png,image/webp"
                 onChange={handleImageChange}
               />
               {imagePreview && (
