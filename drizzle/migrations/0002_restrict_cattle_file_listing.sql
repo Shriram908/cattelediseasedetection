@@ -1,0 +1,2 @@
+DROP POLICY IF EXISTS "Anyone can view cattle images" ON storage.objects;
+CREATE POLICY "Owners can list cattle images" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'cattle-images' AND (storage.foldername(name))[1] = auth.uid()::text);
