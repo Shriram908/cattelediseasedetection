@@ -43,6 +43,13 @@
       "when": 1794896235491,
       "tag": "0005_store_phone_on_signup",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794896663351,
+      "tag": "0006_prevent_duplicate_signup",
+      "breakpoints": true
     }
   ]
 }

@@ -560,6 +560,7 @@ export type Database = {
     }
     Functions: {
       admin_metrics: { Args: { days?: number }; Returns: Json }
+      email_registered: { Args: { _email: string }; Returns: boolean }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
