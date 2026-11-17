@@ -111,6 +111,30 @@ export type Database = {
           },
         ]
       }
+      chatbot_queries: {
+        Row: {
+          created_at: string
+          id: string
+          language: string
+          query: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          language: string
+          query: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          language?: string
+          query?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string
@@ -142,6 +166,38 @@ export type Database = {
             columns: ["report_id"]
             isOneToOne: false
             referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      disease_embeddings: {
+        Row: {
+          content: string
+          disease_id: string
+          embedding: string
+          model: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          disease_id: string
+          embedding: string
+          model?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          disease_id?: string
+          embedding?: string
+          model?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "disease_embeddings_disease_id_fkey"
+            columns: ["disease_id"]
+            isOneToOne: true
+            referencedRelation: "diseases"
             referencedColumns: ["id"]
           },
         ]
@@ -514,13 +570,21 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin: { Args: never; Returns: boolean }
+      match_diseases: {
+        Args: { match_count?: number; query_embedding: string }
+        Returns: {
+          disease_id: string
+          similarity: number
+        }[]
+      }
       vet_has_notes_on_report: {
         Args: { _report_id: string; _vet_id: string }
         Returns: boolean
       }
     }
     Enums: {
-      app_role: "farmer" | "veterinarian"
+      app_role: "farmer" | "veterinarian" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -648,7 +712,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["farmer", "veterinarian"],
+      app_role: ["farmer", "veterinarian", "admin"],
     },
   },
 } as const
