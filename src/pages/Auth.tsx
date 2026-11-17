@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Activity } from "lucide-react";
 import { Session } from "@supabase/supabase-js";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import PhoneOtpForm from "@/components/auth/PhoneOtpForm";
 import { useI18n } from "@/lib/i18n";
 
 const Auth = () => {
@@ -93,6 +94,23 @@ const Auth = () => {
           <p className="text-muted-foreground">{t("auth.tagline")}</p>
         </div>
 
+        <Tabs defaultValue="phone" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-4">
+            <TabsTrigger value="phone">{t("auth.mobileOtp")}</TabsTrigger>
+            <TabsTrigger value="email">{t("auth.emailPassword")}</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="phone">
+            <Card>
+              <CardHeader>
+                <CardTitle>{t("auth.mobileOtp")}</CardTitle>
+                <CardDescription>{t("auth.mobileOtpDesc")}</CardDescription>
+              </CardHeader>
+              <CardContent><PhoneOtpForm /></CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="email">
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-4">
             <TabsTrigger value="login">{t("auth.login")}</TabsTrigger>
@@ -153,6 +171,8 @@ const Auth = () => {
                 </CardFooter>
               </form>
             </Card>
+          </TabsContent>
+        </Tabs>
           </TabsContent>
         </Tabs>
       </div>
