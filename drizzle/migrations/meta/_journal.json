@@ -36,6 +36,13 @@
       "when": 1794894035514,
       "tag": "0004_admin_metrics_contact_validation",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794896235491,
+      "tag": "0005_store_phone_on_signup",
+      "breakpoints": true
     }
   ]
 }
