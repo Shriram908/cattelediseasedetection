@@ -3,8 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { authenticate, readBody, corsHeaders, jsonResponse, RequestError, errorResponse } from "../_shared/security.ts";
 import { DIAGNOSIS_CURRENCY, DIAGNOSIS_PRICE_PAISE, validPaymentSignature, validRazorpayId, validUuid } from "../_shared/payments.ts";
 
-const keyId = Deno.env.get("RAZORPAY_KEY_ID") ?? "";
-const keySecret = Deno.env.get("RAZORPAY_KEY_SECRET") ?? "";
+const keyId = (Deno.env.get("RAZORPAY_KEY_ID") ?? "").trim();
+const keySecret = (Deno.env.get("RAZORPAY_KEY_SECRET") ?? "").trim();
 
 async function createOrder(admin: ReturnType<typeof createClient>, userId: string, reportId: unknown) {
   if (!validUuid(reportId)) throw new RequestError("Invalid report");
