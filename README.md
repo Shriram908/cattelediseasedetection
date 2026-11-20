@@ -50,7 +50,7 @@ The curated library contains **15 disease records in the reviewed deployment**. 
 | Cattle registry | Add and edit cattle details and photographs | Access is scoped to the owner, with authorized admin read access |
 | AI diagnosis | Symptoms, observations, optional photo, semantic retrieval, saved report | Preliminary assessment; AI service availability and credits are required |
 | Diagnosis reports | Severity, confidence, care guidance, precautions, printing | New farmer reports are payment-locked; older pre-payment reports remain readable |
-| Payments | Razorpay Checkout, ₹99 per report, server-side signature verification | Configured for test-mode use; live collection requires live credentials and release checks |
+| Payments | Razorpay Checkout, ₹99 per report, server-side order/capture verification | Connected in test mode; live collection requires live credentials and release checks |
 | Chatbot | Streaming cattle-health answers in three languages | Currently uses the model's general knowledge; **does not call the vector retriever** |
 | Vaccination records | Vaccine dates, next due date, administrator name, batch number, notes | Due/overdue indicators are in-app; scheduled SMS/email reminders are not implemented |
 | Admin dashboard | Diagnosis, signup-profile, and chatbot-question lists; trend charts | Requires a server-verified admin role; each list displays up to 100 recent records |
@@ -269,9 +269,9 @@ All `VITE_*` values are bundled into the browser application. **Never put AI sec
 
 | Secret or managed value | Used for |
 | --- | --- |
-| `LOVABLE_API_KEY` | AI Gateway generation and embedding requests |
-| `RAZORPAY_KEY_ID` | Razorpay order creation and Checkout identification |
-| `RAZORPAY_KEY_SECRET` | Razorpay API authentication and payment-signature verification |
+| `LOVABLE_API_KEY` | AI and connector gateway requests |
+| `RAZORPAY_CONNECTION_KEY_ID` | Connected Razorpay account's Checkout key ID |
+| `RAZORPAY_CONNECTION_KEY` | Server-only Razorpay connector gateway credential |
 | Managed backend runtime credentials | Caller-scoped requests and authorized privileged operations inside functions |
 
 Store private values in Lovable Cloud's server secret configuration. Managed privileged credentials are injected by the platform, are not available for extraction, and must never be copied into GitHub or Vercel. The frontend does not need the Razorpay secret or AI key.
@@ -340,7 +340,9 @@ All application operations below require a signed-in caller. Send an authenticat
 | `translate-content` | `texts` array, `targetLanguage` (`en`, `hi`, `mr`) | Returns `{ translated: [...] }`; English can pass through unchanged |
 | `index-diseases` | Empty JSON object | Requires admin; embeds and upserts disease records; returns `{ indexed: count }` |
 | `razorpay-payment` | `action: "create_order"`, `report_id` | Creates an owned-report order or reports that it is already unlocked |
-| `razorpay-payment` | `action: "verify"`, `order_id`, `payment_id`, `signature` | Verifies the signature, records payment, and unlocks the report |
+| `razorpay-payment` | `action: "verify"`, `order_id` | Reads Razorpay payment status and the stored total before unlocking |
+| `razorpay-payment` | `action: "check_report"`, `report_id` | Recovers completed payments when the farmer returns |
+| `razorpay-webhook` | Razorpay event | Public hint; confirms known orders by reading Razorpay, never by trusting the event |
 
 Example diagnosis body (replace the placeholder UUID with an owned cattle ID):
 
@@ -364,8 +366,8 @@ The current fee is **₹99 = 9,900 paise**, currency **INR**, charged once to un
 2. The farmer sees limited metadata and a payment button; report results are not returned to the farmer's browser.
 3. `create_order` verifies report ownership and creates a server-priced Razorpay order.
 4. The browser opens Razorpay Checkout with the order details.
-5. Checkout success supplies an order ID, payment ID, and signature to `verify`.
-6. The server verifies `HMAC-SHA256(order_id + "|" + payment_id, key_secret)` using constant-time comparison.
+5. Checkout success or dismissal supplies the stored order ID to `verify`; report load and resume also check for completed payment.
+6. The server reads the order through the connected account and requires paid status, exact stored amount paid, total and currency; authorized payments are captured for the stored amount and checked before unlocking.
 7. Payment status is recorded as `paid`, the report is unlocked, and the frontend refetches it.
 
 Only the privileged payment function may change unlock state. Administrators retain authorized report access for oversight; the farmer payment restriction does not remove admin permissions. Reports created before payment protection was introduced remain unlocked.
@@ -376,9 +378,11 @@ Only the privileged payment function may change unlock state. Administrators ret
 - Complete a full test payment and confirm payment status and report unlock read back correctly.
 - Check cancellation, failed verification, retries, and repeated verification.
 - Define refund, support, and payment reconciliation procedures.
-- Review whether capture/status checks, webhook-based recovery, and transactional payment/unlock updates are required for production.
+- Configure Razorpay webhooks and review transactional payment/unlock updates for production.
 
-The current code has no payment webhook, refund flow, or automatic reconciliation job. Payment recording and report unlocking are separate writes. A prior check verified order creation and Checkout opening, **not a completed test payment through to unlock**. Test keys do not collect real customer money.
+Retries reuse existing unpaid orders. Payment recording and unlocking are idempotent separate writes; a later confirmation repairs an interrupted unlock. Refunds and scheduled reconciliation are not implemented. Verified ₹99 order creation, retry reuse, Checkout opening, anonymous denial and unpaid-order protection; **a full test payment through unlock still needs manual completion**. Test keys do not collect real customer money.
+
+After deploying the Vercel changes, configure **Accounts & Settings → Webhooks → Add New Webhook** in Razorpay with `https://cattlecareai.vercel.app/api/razorpay-webhook`. Select `payment.captured`, `payment.authorized` and `order.paid`; leave Secret empty because the handler independently reads the payment from Razorpay. Test and live modes each need their own webhook. The Vercel address forwards to the deployed Cloud handler; verify delivery after Vercel redeploys.
 
 ## Languages and reports
 
@@ -543,7 +547,7 @@ The dashboard is an oversight view, not a role-management or disease-library edi
 - Clinical evaluation with labeled cases and independently measured metrics.
 - Vector-grounded chatbot responses with explicit reference provenance.
 - Consent-based report email and reliable scheduled reminders.
-- Payment webhook recovery, reconciliation, and refund handling.
+- Scheduled payment reconciliation, transactional unlocks, and refund handling.
 - Improved admin pagination/export and privacy/retention controls.
 - Stronger observability, abuse protection, accessibility testing, and disaster-recovery exercises.
 

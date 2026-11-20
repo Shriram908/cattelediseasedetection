@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Lock, Loader2, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useI18n } from "@/lib/i18n";
-import { formatRupees, loadRazorpayCheckout, type RazorpaySuccess } from "@/lib/razorpay";
+import { formatRupees, loadRazorpayCheckout } from "@/lib/razorpay";
 import { DIAGNOSIS_PRICE_PAISE } from "../../supabase/functions/_shared/payments";
 
 interface PayToUnlockProps {
@@ -26,14 +27,34 @@ export default function PayToUnlock({ reportId, cattleName, diagnosisDate, onUnl
     toast({ variant: "destructive", title: t("payment.failed"), description });
   };
 
-  const verify = async (result: RazorpaySuccess) => {
-    const { error } = await supabase.functions.invoke("razorpay-payment", {
-      body: { action: "verify", order_id: result.razorpay_order_id, payment_id: result.razorpay_payment_id, signature: result.razorpay_signature },
-    });
-    if (error) return fail(t("payment.verifyFailed"));
-    toast({ title: t("payment.success") });
-    setBusy(false);
-    onUnlocked();
+  const paymentError = async (error: unknown) => {
+    if (error instanceof FunctionsHttpError) {
+      const details = await error.context.json().catch(() => null);
+      return typeof details?.error === "string" ? details.error : t("payment.unavailable");
+    }
+    return error instanceof Error ? error.message : t("payment.unavailable");
+  };
+
+  useEffect(() => {
+    let active = true;
+    const check = async () => {
+      const { data, error } = await supabase.functions.invoke("razorpay-payment", { body: { action: "check_report", report_id: reportId } });
+      if (active && !error && data?.unlocked === true) onUnlocked();
+    };
+    void check();
+    const resume = () => { if (document.visibilityState === "visible") void check(); };
+    document.addEventListener("visibilitychange", resume);
+    return () => { active = false; document.removeEventListener("visibilitychange", resume); };
+  }, [reportId, onUnlocked]);
+
+  const verify = async (orderId: string, dismissed = false) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("razorpay-payment", { body: { action: "verify", order_id: orderId } });
+      if (error) throw error;
+      if (data?.unlocked === true) { toast({ title: t("payment.success") }); onUnlocked(); }
+      else if (!dismissed) fail(t("payment.verifyFailed"));
+    } catch (error) { fail(await paymentError(error)); }
+    finally { setBusy(false); }
   };
 
   const pay = async () => {
@@ -54,13 +75,13 @@ export default function PayToUnlock({ reportId, cattleName, diagnosisDate, onUnl
         name: "CattleCare AI",
         description: t("payment.description"),
         prefill: { email: user?.email ?? "", contact: user?.phone ?? "" },
-        handler: verify,
-        modal: { ondismiss: () => setBusy(false) },
+        handler: () => void verify(data.order_id),
+        modal: { ondismiss: () => void verify(data.order_id, true) },
       });
       checkout.on("payment.failed", () => fail(t("payment.declined")));
       checkout.open();
-    } catch {
-      fail(t("payment.unavailable"));
+    } catch (error) {
+      fail(await paymentError(error));
     }
   };
 

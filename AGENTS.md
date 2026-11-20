@@ -7,4 +7,5 @@
 - Run focused security regression tests with the package test command before reporting readiness.
 - Gate admin screens with the server is_admin check (RequireAdmin) and rely on row policies for data; never trust client role state.
 - Phone OTP is passwordless sign-in/sign-up; the signup trigger copies the verified phone into profiles.
-- Diagnosis reports start locked (reports.unlocked); only the razorpay-payment function unlocks them after verifying the Razorpay signature, so paid content is never readable client-side.
+- Diagnosis reports start locked; payment handlers unlock only after server-side Razorpay order/capture verification of the stored total, because connector credentials never expose the signing secret.
+- Keep Razorpay gateway calls and idempotent confirmation in _shared; browser callbacks, resumed reports and webhooks share the same provider-verified recovery path.

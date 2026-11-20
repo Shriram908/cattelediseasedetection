@@ -13,4 +13,6 @@
 - [x] Keep code clean and modular (ongoing standard).
 
 - [x] Razorpay ₹99 pay-per-diagnosis step on Report page (test mode)
+- [x] Repair Razorpay order creation and verified recovery; ₹99 checkout, retry reuse and unpaid-order safeguards verified.
+- [ ] Complete a manual Razorpay test payment through report unlock (requires customer checkout interaction); add webhook in Razorpay after Vercel redeploy.
 - [x] Replace Lovable favicon with CattleCare icon (ships to Vercel via GitHub sync + redeploy)

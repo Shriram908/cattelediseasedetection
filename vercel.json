@@ -4,7 +4,10 @@
   "installCommand": "npm install",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "rewrites": [{ "source": "/((?!assets/|robots\\.txt$|sitemap\\.xml$).*)", "destination": "/index.html" }],
+  "rewrites": [
+    { "source": "/api/razorpay-webhook", "destination": "https://gvemfhbbxrtesacnvoid.supabase.co/functions/v1/razorpay-webhook" },
+    { "source": "/((?!assets/|robots\\.txt$|sitemap\\.xml$).*)", "destination": "/index.html" }
+  ],
   "headers": [
     {
       "source": "/:page(auth|dashboard|diagnose|cattle|report|profile|messages|vaccinations|admin)/:path*",

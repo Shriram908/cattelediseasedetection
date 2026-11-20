@@ -2,6 +2,15 @@
 export const DIAGNOSIS_PRICE_PAISE = 9900;
 export const DIAGNOSIS_CURRENCY = "INR";
 
+/** Only provider-confirmed payment of the stored total can unlock a report. */
+export function orderIsPaid(order: { status?: unknown; amount?: unknown; amount_paid?: unknown; currency?: unknown }, amount: number, currency: string) {
+  return order.status === "paid" && order.amount === amount && order.amount_paid === amount && order.currency === currency;
+}
+
+export function paymentIsCaptured(payment: { status?: unknown; amount?: unknown; currency?: unknown; order_id?: unknown }, orderId: string, amount: number, currency: string) {
+  return payment.status === "captured" && payment.order_id === orderId && payment.amount === amount && payment.currency === currency;
+}
+
 const RAZORPAY_ID = /^[A-Za-z0-9_]{1,64}$/;
 
 export function validRazorpayId(value: unknown): value is string {
